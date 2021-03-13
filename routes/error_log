@@ -1,0 +1,4 @@
+[01-Sep-2020 04:52:13 UTC] PHP Fatal error:  Uncaught Error: Class 'Route' not found in /home/bluelit1/public_html/liondelivery/routes/web.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/bluelit1/public_html/liondelivery/routes/web.php on line 21
