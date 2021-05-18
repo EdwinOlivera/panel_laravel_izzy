@@ -64,6 +64,7 @@ Route::resource('fields', 'API\FieldAPIController');
 Route::resource('categories', 'API\CategoryAPIController');
 Route::get('categories/market/{id}', 'API\CategoryAPIController@getCategoriesMarket');
 Route::resource('markets', 'API\MarketAPIController');
+Route::resource('drivers_alt', 'API\DriverAPIController');
 Route::resource('departments', 'API\DepartmentAPIController');
 Route::resource('subdepartments', 'API\SubdepartmentAPIController');
 Route::resource('sections', 'API\SectionAPIController');
@@ -87,6 +88,8 @@ Route::resource('slides', 'API\SlideAPIController')->except([
 Route::resource('option_groups', 'API\OptionGroupAPIController');
 
 Route::resource('options', 'API\OptionAPIController');
+
+Route::resource('polygon_zone', 'API\PolygonZoneAPIController');
 
 Route::middleware('auth:api')->group(function () {
     Route::group(['middleware' => ['role:driver']], function () {
@@ -116,13 +119,14 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('payments/byMonth', 'API\PaymentAPIController@byMonth')->name('payments.byMonth');
     Route::resource('payments', 'API\PaymentAPIController');
-    
+
     Route::get('favorites/exist', 'API\FavoriteAPIController@exist');
     Route::resource('favorites', 'API\FavoriteAPIController');
-    
+
     Route::resource('orders', 'API\OrderAPIControllerFixed');
     Route::get('orden/verificar', 'API\OrderAPIControllerFixed@revisarOrden');
     Route::get('orden/check', 'API\OrderAPIControllerFixed@checkStatusOrder');
+    Route::get('orden/check_user', 'API\OrderAPIControllerFixed@checkStatusOrderUser');
 
     Route::resource('product_orders', 'API\ProductOrderAPIControllerFixed');
 

@@ -35,7 +35,10 @@ class Coupon extends Model
         'discount_type',
         'description',
         'expires_at',
-        'enabled'
+        'enabled',
+        'total_quantity',
+        'all_products',
+        'max_for_user'
     ];
 
     /**
@@ -49,7 +52,9 @@ class Coupon extends Model
         'discount_type' => 'string',
         'description' => 'string',
         'expires_at' => 'datetime',
-        'enabled' => 'boolean'
+        'enabled' => 'boolean',
+        'all_products' => 'boolean'
+
     ];
 
     /**

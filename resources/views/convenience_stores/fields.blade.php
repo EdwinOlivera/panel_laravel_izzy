@@ -148,9 +148,9 @@
             </div>
         </div>
     </div>
-    <!-- 'Boolean closed Field' -->
-    <div class="form-group row ">
-        {!! Form::label('closed', trans("lang.market_closed"),['class' => 'col-5 control-label text-right']) !!}
+     <!-- 'Boolean closed Field' -->
+     <div class="form-group row ">
+        {!! Form::label('closed', trans("lang.market_closed"),['class' => 'col-3 control-label text-right']) !!}
         <div class="checkbox icheck">
             <label class="col-9 ml-2 form-check-inline">
                 {!! Form::hidden('closed', 0) !!}
@@ -177,6 +177,17 @@
                 {!! Form::hidden('enable_extra_amount', 0) !!}
                 {!! Form::checkbox('enable_extra_amount', 1, null) !!}
             </label>
+        </div>
+    </div>
+
+    <!-- Message closed Field -->
+    <div class="form-group row ">
+        {!! Form::label('message_closed', trans("Mensaje al estar cerrado"), ['class' => 'col-3 control-label text-right']) !!}
+        <div class="">
+            {!! Form::text('message_closed', null,  ['class' => 'form-control','placeholder'=>  trans("En estos momentos estamos cerrados. El día de mañana tomaremos tu pedido con mucho gusto.")]) !!}
+            <div class="form-text text-muted">
+                {{ trans("Mensaje que se mostrara cuando este cerrado el establecimiento") }}
+            </div>
         </div>
     </div>
 </div>

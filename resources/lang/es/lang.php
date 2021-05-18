@@ -334,7 +334,7 @@ return [
 
     'app_setting_orange' => 'Naranja',
 
-    'app_setting_payment' => 'Modos de pagos',
+    'app_setting_payment' => 'Metodos de pagos',
 
     'app_setting_paypal' => 'PayPal',
 
@@ -662,7 +662,7 @@ return [
 
     'delivery_address_create' => 'Crear Dirección de entrega',
 
-    'delivery_address_desc' => 'Adminstrar Direcciones de entrega',
+    'delivery_address_desc' => 'Adminstrar Ubicaciones',
 
     'delivery_address_description' => 'Descripción',
 
@@ -690,9 +690,9 @@ return [
 
     'delivery_address_longitude_placeholder' => 'Agregar Longitude',
 
-    'delivery_address_plural' => 'Direcciones de entrega',
+    'delivery_address_plural' => 'Ubicaciones',
 
-    'delivery_address_table' => 'Direcciones de entrega List',
+    'delivery_address_table' => 'Lista de Ubicaciones',
 
     'delivery_address_updated_at' => 'Actualizado',
 
@@ -1262,7 +1262,7 @@ return [
 
     'notification_create' => 'Crear Notificación',
 
-    'notification_created_at' => 'Notificado el:',
+    'notification_created_at' => 'Notificado hace:',
 
     'notification_desc' => 'Notifications Management',
 
@@ -1282,13 +1282,13 @@ return [
 
     'notification_plural' => 'Notifications',
 
-    'notification_read' => 'Read',
+    'notification_read' => 'Leida',
 
-    'notification_read_at' => 'Read At',
+    'notification_read_at' => 'Leida hace',
 
-    'notification_read_help' => 'Agregar Read',
+    'notification_read_help' => 'Leer',
 
-    'notification_read_placeholder' => 'Agregar Read',
+    'notification_read_placeholder' => 'Leer',
 
     'notification_status_changed_description' => 'Su orden #:order_id está :order_status toca para dar seguimiento',
 
@@ -1296,11 +1296,11 @@ return [
 
     'notification_table' => 'Notifications List',
 
-    'notification_title' => 'Titulo',
+    'notification_title' => 'Titúlo',
 
-    'notification_title_help' => 'Agregar Title',
+    'notification_title_help' => 'Agregar Titúlo',
 
-    'notification_title_placeholder' => 'Agregar Title',
+    'notification_title_placeholder' => 'Agregar Titúlo',
 
     'notification_updated_at' => 'Actualizado',
 
@@ -1310,7 +1310,7 @@ return [
 
     'notification_user_id_placeholder' => 'Agregar Id Usuario',
 
-    'notification_your_order' => 'Su orden #:order_id está :order_status',
+    'notification_your_order' => 'Tu #:order_id :order_status',
 
     'number' => 'Number',
 
@@ -1340,9 +1340,9 @@ return [
 
     'order_driver_id' => 'Delivery Boy',
 
-    'order_driver_id_help' => 'Select Delivery Boy',
+    'order_driver_id_help' => 'Seleccionar repartidor',
 
-    'order_driver_id_placeholder' => 'Select Delivery Boy',
+    'order_driver_id_placeholder' => 'Seleccionar repartidor',
 
     'order_edit' => 'Editar Orden',
 
@@ -1770,7 +1770,7 @@ return [
 
     'user_plural' => 'Usuarios',
 
-    'user_profile' => 'Profile',
+    'user_profile' => 'Perfil',
 
     'user_remember_token' => 'Remember Token',
 
@@ -2001,6 +2001,24 @@ return [
     'market_closed' => 'cerrado',
 
     //Nuevos terminos agregados
+    'total_quantity' => 'Usos permitidos',
+    'total_quantity_help' => 'La cantida maxima de usos permitidos',
+    'total_quantity_placeholder' => '50',
+
+    'max_for_user' => 'Usos por usuarios',
+    'max_for_user_help' => 'La cantida maxima de usos permitidos por usuario',
+    'max_for_user_placeholder' => '2',
+
+    'Waiting for Client' => 'Pago pendiente',
+    'Not Paid' => 'No pagada',
+    'Paid' => 'Pagada',
+    'Notifications_StatusChangedOrder' => 'Una orden Cambio de estado',
+    'Notifications_AcepptedAndAssignedOrder' => 'Una orden esta buscando repartidor',
+    'Notifications_OrderRejected' => 'Una orden fue rechazada',
+    'Notifications_OrderNoAccept' => 'Una orden fue rechazada por un repartidor',
+    'Notifications_NewOrder' => 'Se hizo una nueva orden',
+    'Notifications_OrderAccepted' => 'Se acepto una orden',
+
 
     'department_updated_at' => 'Actualización',
     'department_plural' => 'Departamentos',
@@ -2233,7 +2251,7 @@ return [
     'coupon_code_help' => 'Insertar código de cupón',
     'coupon_code_placeholder' => 'PROMOCIÓN',
     'coupon_discount' => 'Descuento',
-    'coupon_discount_help' => 'Insertar descuento Importe <b> fijo </b> (Ej: 8 por 8 $) o <b> Porcentaje </b> (Ej: 10 por 10%)',
+    'coupon_discount_help' => 'Insertar descuento Importe <b> fijo </b> (Ej: 8 para 8 L), <b> Porcentaje </b> (Ej: 10 para 10%) o <b> Envio </b> (Ej: 10 para 10%)',
     'coupon_discount_placeholder' => '8',
     'coupon_discount_type' => 'Tipo de descuento',
     'coupon_percent' => 'Porcentaje',
@@ -2243,7 +2261,7 @@ return [
     'coupon_description' => 'Descripción',
     'coupon_description_help' => 'Insertar descripción',
     'coupon_description_placeholder' => 'Insertar descripción',
-    'coupon_expires_at' => 'Caduca a las',
+    'coupon_expires_at' => 'Caducidad',
     'coupon_expires_at_help' => 'Insertar expira en',
     'coupon_expires_at_placeholder' => 'Insertar expira en',
     'coupon_enabled' => 'Habilitado',
@@ -2281,7 +2299,7 @@ return [
     'distance_per_extra' => 'Distancia mínima antes del Extra',
     'distance_per_extra_help' => 'Edite la distancia mínima antes del cobro extra (Ej 6 = 6 km / mi)',
     'distance_per_extra_placeholder' => 'Edite la distancia mínima antes del cargo extra al pedido',
-    'app_setting_fac_password_help' => 'Inserte la contraseña del comerciante del perfil F.A.C',
+    'app_setting_fac_password_help' => 'Inserte la Contraseña de procesamiento del comerciante del perfil F.A.C, correspondiente. Es una contraseña diferente a la usada para iniciar sesión en el perfil',
     'app_setting_fac_password' => 'Contraseña',
     'app_setting_enable_fac' => 'Habilitar F.A.C',
     'app_setting_enable_fac_help' => 'Activar FAC como modo de pago',
@@ -2300,15 +2318,17 @@ return [
     'app_setting_fac_base_url_3d_secure_help' => 'Inserte la URL 3D Secure Base para F.A.C. cambiar "marlin" por "ecm" para realizar pruebas',
     'app_setting_fac_base_url_3d_secure_placeholder' => 'ejem: https://ecm.firstatlanticcommerce.com/PGServiceXML/Authorize3DS',
     'scheduled_order_hours' => 'Horas de órdenes agendada',
-    'payment_encargo_done' => 'Encargo pagada satisfactoriamente',
-    'payment_encargo_waiting' => 'Encargo no pagado todavia',
+    'payment_encargo_done' => 'Mandadito pagada satisfactoriamente',
+    'payment_encargo_waiting' => 'Mandadito no pagado todavia',
     'encargo' => 'encargo',
     'payment_status_help' => 'Seleccione el estado del pedido',
     'payment_status_placeholder' => 'Seleccione el estado del pedido',
-    'encargo_edit' => 'Editar Encargo',
-    'encargo_status_id' => "Estado del Encargo",
+    'encargo_edit' => 'Editar Mandadito',
+    'encargo_driver_id_placeholder' => 'Seleccionar repartidor',
+
+    'encargo_status_id' => "Estado del Mandadito",
     'encargo_driver_id' => "Repartidor",
-    'encargo_status_id_help' => "Estado actual del Encargo",
+    'encargo_status_id_help' => "Estado actual del Mandadito",
     'encargo_driver_id_help' => "Seleccione Repartidor",
     'encargo_active' => "Activo",
     'encargo_pending' => "Pendiente",
@@ -2316,20 +2336,20 @@ return [
     'encargo_paid' => "Pagada",
     'save' => 'Guardar',
     'saved_successfully' => ':operator Guardado Exitoso',
-    'encargo_plural' => 'Encargos',
-    'encargo_id' => 'ID Encargo',
+    'encargo_plural' => 'Mandaditos',
+    'encargo_id' => 'ID Mandadito',
     'encargo_user_id' => 'Cliente',
     'encargo_tax' => 'Impuesto',
-    'encargo_delivery_fee' => 'Cobro por Encargo',
-    'encargo_table' => 'Tabla de Encargo',
+    'encargo_delivery_fee' => 'Cobro por Mandadito',
+    'encargo_table' => 'Tabla de Mandadito',
     'encargo_edit_properties' => 'Editar Propiedades',
-    'encargo_desc' => 'Administrar Encargos',
-    'encargos_list' => 'Lista de Encargos',
+    'encargo_desc' => 'Administrar Mandaditos',
+    'encargos_list' => 'Lista de Mandaditos',
     'client_encargo' => 'Client',
-    'status_encargo' => 'Estado de Encargo',
+    'status_encargo' => 'Estado de Mandadito',
     'app_setting_enable_pay_on_line' => 'Habilitar pago desde internet',
     'app_setting_enable_pay_on_line_help' => 'Activar pagos en línea',
-    'encargo' => 'Encargo',
+    'encargo' => 'Mandadito',
     'encargo_properties' => 'Propiedades',
     'app_setting_enable_online_payments' => 'Habilitar pagos en línea',
     'app_setting_general_payment_control' => 'Control general de pago',
@@ -2371,13 +2391,16 @@ return [
     'app_setting_pixelpay_dominio_help' => 'Ingrese el dominio URL de PixelPay',
     'app_setting_pixelpay_dominio_placeholder' => 'https://(DOMINIO)/sandbox/hosted/payment',
     'option_group_updated_at' => 'Ultim. Actualización',
-    'group_number_of_items_title' => 'Cantidad de opciones seleccionables, 1 = Todos',
+    'group_number_of_items_title' => 'Cantidad de opciones seleccionables',
     'group_number_of_items_enable' => 'Cantidad de opciones seleccionables',
     'group_number_of_items_placeholder' => '3',
-    'quantity_selectable_elements_help' => 'Ingrese la cantidad de elementos seleccionables. Minimo 1',
+    'quantity_selectable_elements_help' => 'Ingrese la cantidad de elementos seleccionables. Minimo 2',
     'option_group_multi' => 'Multi seleccionable',
     'option_group_checbox_help' => '  Habiltar/Deshabilitar Selección multiple',
     'mobile_home' => 'Pantalla principal',
+    'mobile_message' => 'Mensajes generales',
+    'app_setting_mobile_mobile_message' => 'Edicición de mensajes generales',
+
     'force_select' => 'Forzar selección',
     'force_select_help' => 'Forzar al usuario a seleccionar al menos una opción del grupo',
 

@@ -766,8 +766,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-12 control-label" for="cant_selectable">Cantidad seleccionable. 1 =
-                                TODOS</label>
+                            <label class="col-12 control-label" for="cant_selectable">Cantidad seleccionable.</label>
                             <div class="col-sm-9">
                                 <input class="form-control" min="1" value="1" placeholder="3" id="cant_selectable"
                                     name="cant_selectable" type="number">
@@ -844,8 +843,7 @@
 
                             </div>
                             <div class="form-group">
-                                <label class="col-12 control-label" for="cant_selectableUPDATE">Cantidad seleccionable.
-                                    1 = TODOS</label>
+                                <label class="col-12 control-label" for="cant_selectableUPDATE">Cantidad seleccionable.</label>
                                 <div class="col-sm-9">
                                     <input class="form-control" min="1" value="1" placeholder="3"
                                         id="cant_selectableUPDATE" name="cant_selectable" type="number">
@@ -958,6 +956,7 @@
 
         $(document).ready(function() {
             searchProducts();
+            console.log("ID del establecimiento: "+{{ $market->id }});
             searchCategory();
             searchOptionGroup();
             porbarLocalStore();

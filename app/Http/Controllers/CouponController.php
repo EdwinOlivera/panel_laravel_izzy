@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Criteria\Coupons\CouponsOfManagerCriteria;
 use App\Criteria\Coupons\CouponsOfUserCriteria;
-use App\Criteria\Products\ProductsOfUserCriteria;
 use App\Criteria\Markets\ActiveCriteria;
 use App\Criteria\Markets\MarketsOfUserCriteria;
+use App\Criteria\Products\ProductsOfUserCriteria;
 use App\DataTables\CouponDataTable;
-use App\Http\Requests;
 use App\Http\Requests\CreateCouponRequest;
 use App\Http\Requests\UpdateCouponRequest;
+use App\Repositories\CategoryRepository;
 use App\Repositories\CouponRepository;
 use App\Repositories\CustomFieldRepository;
 use App\Repositories\DiscountableRepository;
-use App\Repositories\ProductRepository;
 use App\Repositories\MarketRepository;
-use App\Repositories\CategoryRepository;
+use App\Repositories\ProductRepository;
 use Flash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -52,8 +50,7 @@ class CouponController extends Controller
 
     public function __construct(CouponRepository $couponRepo, CustomFieldRepository $customFieldRepo, ProductRepository $productRepo
         , MarketRepository $marketRepo
-        , CategoryRepository $categoryRepo , DiscountableRepository $discountableRepository)
-    {
+        , CategoryRepository $categoryRepo, DiscountableRepository $discountableRepository) {
         parent::__construct();
         $this->couponRepository = $couponRepo;
         $this->customFieldRepository = $customFieldRepo;
@@ -83,12 +80,12 @@ class CouponController extends Controller
     public function create()
     {
         $this->productRepository->pushCriteria(new ProductsOfUserCriteria(auth()->id()));
-        $product = $this->productRepository->groupedByMarkets();
-
+        // $product = $this->productRepository->groupedByMarkets();
+        $product = [];
+        $optionGroup = [];
         $this->marketRepository->pushCriteria(new MarketsOfUserCriteria(auth()->id()));
         $this->marketRepository->pushCriteria(new ActiveCriteria());
         $market = $this->marketRepository->pluck('name', 'id');
-
         $category = $this->categoryRepository->pluck('name', 'id');
 
         $productsSelected = [];
@@ -115,21 +112,22 @@ class CouponController extends Controller
         $input = $request->all();
         $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->couponRepository->model());
         try {
+            // return $input;
             $coupon = $this->couponRepository->create($input);
             $discountables = [];
-            if(isset($input['products'])){
-                foreach ($input['products'] as $productId){
-                    $discountables[] = ["discountable_type"=>"App\Models\Product","discountable_id"=>$productId];
+            if (isset($input['products'])) {
+                foreach ($input['products'] as $productId) {
+                    $discountables[] = ["discountable_type" => "App\Models\Product", "discountable_id" => $productId];
                 }
             }
-            if(isset($input['markets'])){
-                foreach ($input['markets'] as $marketId){
-                    $discountables[] = ["discountable_type"=>"App\Models\Market","discountable_id"=>$marketId];
+            if (isset($input['markets'])) {
+                foreach ($input['markets'] as $marketId) {
+                    $discountables[] = ["discountable_type" => "App\Models\Market", "discountable_id" => $marketId];
                 }
             }
-            if(isset($input['categories'])){
-                foreach ($input['categories'] as $categoryId){
-                    $discountables[] = ["discountable_type"=>"App\Models\Category","discountable_id"=>$categoryId];
+            if (isset($input['categories'])) {
+                foreach ($input['categories'] as $categoryId) {
+                    $discountables[] = ["discountable_type" => "App\Models\Category", "discountable_id" => $categoryId];
                 }
             }
             $coupon->discountables()->createMany($discountables);
@@ -184,7 +182,8 @@ class CouponController extends Controller
             return redirect(route('coupons.index'));
         }
         $this->productRepository->pushCriteria(new ProductsOfUserCriteria(auth()->id()));
-        $product = $this->productRepository->groupedByMarkets();
+        // $product = $this->productRepository->groupedByMarkets();
+        $product = [];
 
         $this->marketRepository->pushCriteria(new MarketsOfUserCriteria(auth()->id()));
         $this->marketRepository->pushCriteria(new ActiveCriteria());
@@ -192,9 +191,14 @@ class CouponController extends Controller
 
         $category = $this->categoryRepository->pluck('name', 'id');
 
-        $productsSelected = $coupon->discountables()->where("discountable_type","App\Models\Product")->pluck('discountable_id');
-        $marketsSelected = $coupon->discountables()->where("discountable_type","App\Models\Market")->pluck('discountable_id');
-        $categoriesSelected = $coupon->discountables()->where("discountable_type","App\Models\Category")->pluck('discountable_id');
+        $productsSelectedID = $coupon->discountables()->where("discountable_type", "App\Models\Product")->pluck('discountable_id');
+        $productosSeleccionados = $this->productRepository->whereIn('id', $productsSelectedID)->pluck('name', 'id')->toArray();
+
+        $productsSelected = $productsSelectedID;
+        $product = $productosSeleccionados;
+
+        $marketsSelected = $coupon->discountables()->where("discountable_type", "App\Models\Market")->pluck('discountable_id');
+        $categoriesSelected = $coupon->discountables()->where("discountable_type", "App\Models\Category")->pluck('discountable_id');
 
         $customFieldsValues = $coupon->customFieldsValues()->with('customField')->get();
         $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->couponRepository->model());
@@ -202,7 +206,8 @@ class CouponController extends Controller
         if ($hasCustomField) {
             $html = generateCustomField($customFields, $customFieldsValues);
         }
-
+        $coupon->left_used = $coupon->total_quantity - $coupon->used;
+        // return $coupon;
         return view('coupons.edit')->with('coupon', $coupon)->with("customFields", isset($html) ? $html : false)->with("product", $product)->with("market", $market)->with("category", $category)->with("productsSelected", $productsSelected)->with("marketsSelected", $marketsSelected)->with("categoriesSelected", $categoriesSelected);
     }
 
@@ -231,24 +236,23 @@ class CouponController extends Controller
         try {
             $coupon = $this->couponRepository->update($input, $id);
             $discountables = [];
-            if(isset($input['products'])){
-                foreach ($input['products'] as $productId){
-                    $discountables[] = ["discountable_type"=>"App\Models\Product","discountable_id"=>$productId];
+            if (isset($input['products'])) {
+                foreach ($input['products'] as $productId) {
+                    $discountables[] = ["discountable_type" => "App\Models\Product", "discountable_id" => $productId];
                 }
             }
-            if(isset($input['markets'])){
-                foreach ($input['markets'] as $marketId){
-                    $discountables[] = ["discountable_type"=>"App\Models\Market","discountable_id"=>$marketId];
+            if (isset($input['markets'])) {
+                foreach ($input['markets'] as $marketId) {
+                    $discountables[] = ["discountable_type" => "App\Models\Market", "discountable_id" => $marketId];
                 }
             }
-            if(isset($input['categories'])){
-                foreach ($input['categories'] as $categoryId){
-                    $discountables[] = ["discountable_type"=>"App\Models\Category","discountable_id"=>$categoryId];
+            if (isset($input['categories'])) {
+                foreach ($input['categories'] as $categoryId) {
+                    $discountables[] = ["discountable_type" => "App\Models\Category", "discountable_id" => $categoryId];
                 }
             }
             $coupon->discountables()->delete();
             $coupon->discountables()->createMany($discountables);
-
 
             foreach (getCustomFieldsValues($customFields, $request) as $value) {
                 $coupon->customFieldsValues()

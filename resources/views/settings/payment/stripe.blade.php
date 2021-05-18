@@ -20,7 +20,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="{!! url('settings/payment/payment') !!}"><i class="fa fa-money mr-2"></i>{{trans('lang.app_setting_payment')}}</a>
             </li>
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link " href="{!! url('settings/payment/paypal') !!}"><i class="fa fa-paypal mr-2"></i>{{trans('lang.app_setting_paypal')}}@if(setting('enable_paypal', false))<span class="badge ml-2 badge-success">{{trans('lang.active')}}</span>@endif</a>
             </li>
             <li class="nav-item">
@@ -30,7 +30,7 @@
             <li class="nav-item">
                 <a class="nav-link " href="{!! url('settings/payment/razorpay') !!}"><i class="fa fa-envelope-o mr-2"></i>{{trans('lang.app_setting_razorpay')}}@if(setting('enable_razorpay',false))<span class="badge ml-2 badge-success">{{trans('lang.active')}}</span>@endif
                 </a>
-            </li>
+            </li> --}}
             {{-- enable_pixelpay --}}
             {{-- <li class="nav-item">
                 <a class="nav-link " href="{!! url('settings/payment/pixelpay') !!}"><i class="fa fa-credit-card-alt mr-2"></i>{{trans('lang.app_setting_pixelpay')}}@if(setting('enable_pixelpay',false))<span class="badge ml-2 badge-success">{{trans('lang.active')}}</span>@endif

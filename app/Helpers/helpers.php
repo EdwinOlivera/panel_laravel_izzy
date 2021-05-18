@@ -36,7 +36,7 @@ function getMediaColumn($mediaModel, $mediaCollectionName = '', $optionClass = '
 
     if ($mediaModel->hasMedia($mediaCollectionName)) {
         return "<img class='" . $optionClass . "' style='width:50px' src='" . $mediaModel->getFirstMediaUrl($mediaCollectionName, $mediaThumbnail) . "' alt='" . $mediaModel->getFirstMedia($mediaCollectionName)->name . "'>";
-    }else{
+    } else {
         return "<img class='" . $optionClass . "' style='width:50px' src='" . asset('images/image_default.png') . "' alt='image_default'>";
     }
 }
@@ -66,7 +66,7 @@ function getPriceColumn($modelObject, $attributeName = 'price')
 {
 
     if ($modelObject[$attributeName] != null && strlen($modelObject[$attributeName]) > 0) {
-        $modelObject[$attributeName] = number_format((float)$modelObject[$attributeName], 2, '.', '');
+        $modelObject[$attributeName] = number_format((float) $modelObject[$attributeName], 2, '.', '');
         if (setting('currency_right', false) != false) {
             return $modelObject[$attributeName] . "<span>" . setting('default_currency') . "</span>";
         } else {
@@ -79,9 +79,9 @@ function getPriceColumn($modelObject, $attributeName = 'price')
 function getPrice($price = 0)
 {
     if (setting('currency_right', false) != false) {
-        return number_format((float)$price, 2, '.', '') . "<span>" . setting('default_currency') . "</span>";
+        return number_format((float) $price, 2, '.', '') . "<span>" . setting('default_currency') . "</span>";
     } else {
-        return "<span>" . setting('default_currency') . "</span>" . number_format((float)$price, 2, '.', ' ');
+        return "<span>" . setting('default_currency') . "</span>" . number_format((float) $price, 2, '.', ' ');
     }
 }
 
@@ -125,9 +125,48 @@ function getNotBooleanColumn($column, $attributeName)
 function getPayment($column, $attributeName)
 {
     if (isset($column) && $column[$attributeName]) {
-        return "<span class='badge badge-success'>" . $column[$attributeName] . "</span> ";
+        // return "<span class='badge badge-success'>" . $column[$attributeName] . "</span> ";
+        if ($column[$attributeName] == 'Not Paid') {
+            return "<span class='badge badge-danger'>" . trans('lang.order_not_paid') . "</span>";
+        } else {
+
+            return "<span class='badge badge-success'>" . trans('lang.' . $column[$attributeName]) . "</span> ";
+        }
     } else {
         return "<span class='badge badge-danger'>" . trans('lang.order_not_paid') . "</span>";
+    }
+}
+
+/**
+ * generate order payment column for datatable
+ * @param $order_status_id
+ * @return string
+ */
+function getStatusDriver($order_status_id, $driver_accept)
+{
+    if (isset($order_status_id) && isset($driver_accept)) {
+        if ($order_status_id == '3' && $driver_accept) {
+            return "<span class='badge badge-primary'>" . "Entregando" . "</span> ";
+
+        } else {
+            if ($order_status_id == '4' && $driver_accept) {
+                return "<span class='badge badge-success'>" . "La entrego" . "</span> ";
+    
+            } else {
+             
+                if ($order_status_id == '2' && $driver_accept) {
+                    return "<span class='badge badge-secondary'>" . "En camino al comercio" . "</span> ";
+        
+                } else {
+                    return "<span class='badge badge-danger'>" . "Sin repartidor" . "</span> ";
+                }
+
+                return "<span class='badge badge-danger'>" . "Sin repartidor" . "</span> ";
+            }
+        }       
+
+    } else {
+        return "<span class='badge badge-warning'>" . 'Estado desconocido' . "</span>";
     }
 }
 
@@ -175,7 +214,7 @@ function getArrayColumn($array = [], $titleAttribute = 'title', $optionClass = '
     foreach ($array as $link) {
         $title = $link[$titleAttribute];
 //        $replace = preg_replace('/\$\{href\}/', url($baseUrl, $link[$idAttribute]), $html);
-//        $replace = preg_replace('/\$\{title\}/', $link[$titleAttribute], $replace);
+        //        $replace = preg_replace('/\$\{title\}/', $link[$titleAttribute], $replace);
         $html = "<span class='{$optionClass}'>{$title}</span>";
         $result[] = $html;
     }
@@ -423,7 +462,7 @@ function generateCustomField($fields, $fieldsValues = null)
         if ($fieldsValues) {
             foreach ($fieldsValues as $value) {
                 if ($field->id === $value->customField->id) {
-                    $dynamicVars['$INPUT_ARR_SELECTED$'] = $value->value ? $value->value: '[]';
+                    $dynamicVars['$INPUT_ARR_SELECTED$'] = $value->value ? $value->value : '[]';
                     $dynamicVars['$FIELD_VALUE$'] = '\'' . addslashes($value->value) . '\'';
                     $gf->validations[] = $value->value;
                     continue;
@@ -439,7 +478,6 @@ function generateCustomField($fields, $fieldsValues = null)
             $gf->dbInput = 'hidden,mtm';
         }
         $fieldTemplate = HTMLFieldGenerator::generateCustomFieldHTML($gf, config('infyom.laravel_generator.templates', 'adminlte-templates'));
-
 
         if (!empty($fieldTemplate)) {
             foreach ($dynamicVars as $variable => $value) {
@@ -484,10 +522,16 @@ function render($__php, $__data = null)
     try {
         eval('?' . '>' . $__php);
     } catch (Exception $e) {
-        while (ob_get_level() > $obLevel) ob_end_clean();
+        while (ob_get_level() > $obLevel) {
+            ob_end_clean();
+        }
+
         throw $e;
     } catch (Throwable $e) {
-        while (ob_get_level() > $obLevel) ob_end_clean();
+        while (ob_get_level() > $obLevel) {
+            ob_end_clean();
+        }
+
         throw new FatalThrowableError($e);
     }
     return ob_get_clean();
@@ -537,17 +581,15 @@ function getCustomFieldsValues($customFields = null, $request = null)
             $view = strip_tags($view);
         }
 
-
         $customFieldsValues[] = [
             'custom_field_id' => $cf->id,
             'value' => $value,
-            'view' => $view
+            'view' => $view,
         ];
     }
 
     return $customFieldsValues;
 }
-
 
 /**
  * convert an array to assoc array using one attribute in the array

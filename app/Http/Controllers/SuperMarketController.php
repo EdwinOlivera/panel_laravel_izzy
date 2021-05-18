@@ -188,11 +188,11 @@ class SupermarketController extends Controller
             Flash::error(__('lang.not_found', ['operator' => __('lang.market')]));
             return redirect(route('supermarkets.index'));
         }
-        if ($market['active'] == 0) {
-            $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
-        } else {
-            $user = $this->userRepository->getByCriteria(new ManagersCriteria())->pluck('name', 'id');
-        }
+        // if ($market['active'] == 0) {
+        //     $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
+        // } else {
+        // }
+        $user = $this->userRepository->getByCriteria(new ManagersCriteria())->pluck('name', 'id');
 
         $drivers = $this->userRepository->getByCriteria(new DriversCriteria())->pluck('name', 'id');
         $field = $this->fieldRepository->pluck('name', 'id');
@@ -255,11 +255,11 @@ class SupermarketController extends Controller
             Flash::error(__('lang.not_found', ['operator' => __('lang.market')]));
             return redirect(route('supermarkets.index'));
         }
-        if ($market['active'] == 0) {
-            $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
-        } else {
-            $user = $this->userRepository->getByCriteria(new ManagersCriteria())->pluck('name', 'id');
-        }
+        // if ($market['active'] == 0) {
+        //     $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
+        // } else {
+        // }
+        $user = $this->userRepository->getByCriteria(new ManagersCriteria())->pluck('name', 'id');
 
         $categoryProductsIDRaw = DB::table('categoriesproducts')->where('market_id', $market->id)->pluck('active', 'category_id');
         $categoryProductsID = $market->categoriesProducts()->pluck('category_id')->toArray();
@@ -403,11 +403,11 @@ class SupermarketController extends Controller
             Flash::error(__('lang.not_found', ['operator' => __('lang.market')]));
             return redirect(route('supermarkets.index'));
         }
-        if ($market['active'] == 0) {
-            $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
-        } else {
-            $user = $this->userRepository->getByCriteria(new ManagersCriteria())->pluck('name', 'id');
-        }
+        // if ($market['active'] == 0) {
+        //     $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
+        // } else {
+        // }
+        $user = $this->userRepository->getByCriteria(new ManagersCriteria())->pluck('name', 'id');
 
         $categoryProductsIDRaw = DB::table('categoriesproducts')->where('market_id', $market->id)->pluck('active', 'category_id');
         $categoryProductsID = $market->categoriesProducts()->pluck('category_id')->toArray();

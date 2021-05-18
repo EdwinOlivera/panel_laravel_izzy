@@ -110,7 +110,6 @@ class ProductOrder extends Model
     }
 
     
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      **/
@@ -118,11 +117,5 @@ class ProductOrder extends Model
     {
         return $this->belongsTo(\App\Models\Order::class, 'order_id', 'id');
     }
-//        /**
-//    * @return \Illuminate\Database\Eloquent\Collection
-//    */
-//    public function getOptionsAttribute()
-//    {
-//        return $this->options()->get(['options.id', 'options.name']);
-//    }
+
 }

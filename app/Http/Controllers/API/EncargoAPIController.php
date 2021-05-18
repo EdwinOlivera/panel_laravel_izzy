@@ -19,19 +19,17 @@ use App\Notifications\NewEncargo;
 use App\Notifications\StatusChangedEncargos;
 use App\Repositories\CartRepository;
 use App\Repositories\EncargoRepository;
-use App\Repositories\NotificationRepository; //Es necesario edicion especial
+use App\Repositories\NotificationRepository;
 use App\Repositories\PaymentRepository;
 use App\Repositories\ProductEncargoRepository;
 use App\Repositories\UserRepository;
 use Flash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Prettus\Validator\Exceptions\ValidatorException;
-use Stripe\Token;
 
 /**
  * Class EncargoController
@@ -135,9 +133,7 @@ class EncargoAPIController extends Controller
         $payment = $request->only('payment');
         // return $payment ;
         if (isset($payment['payment']) && $payment['payment']['method']) {
-            // if ($payment['payment']['method'] == "Credit Card (Stripe Gateway)") {
-            //     return $this->stripPayment($request);
-            // }
+
             if ($payment['payment']['method'] == "Tarjeta") {
                 return $this->paymentFac($request);
             } else if ($payment['payment']['method'] == "Efectivo") {
@@ -153,106 +149,6 @@ class EncargoAPIController extends Controller
 
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse|mixed
-     */
-    private function stripPayment(Request $request)
-    {
-        $input = $request->all();
-        $amount = 0;
-        try {
-            $user = $this->userRepository->findWithoutFail($input['user_id']);
-            if (empty($user)) {
-                return $this->sendError('User not found');
-            }
-            $stripeToken = Token::create(array(
-                "card" => array(
-                    "number" => $input['stripe_number'],
-                    "exp_month" => $input['stripe_exp_month'],
-                    "exp_year" => $input['stripe_exp_year'],
-                    "cvc" => $input['stripe_cvc'],
-                    "name" => $user->name,
-                ),
-            ));
-            if ($stripeToken->created > 0) {
-                if (empty($input['delivery_address_id'])) {
-                    $encargo = $this->encargoRepository->create(
-                        $request->only('user_id', 'encargo_status_id', 'tax', 'hint')
-                    );
-                } else {
-                    $encargo = $this->encargoRepository->create(
-                        $request->only('user_id', 'encargo_status_id', 'tax', 'delivery_address_id', 'delivery_fee', 'hint')
-                    );
-                }
-                foreach ($input['products'] as $productEncargo) {
-                    $productEncargo['encargo_id'] = $encargo->id;
-                    $amount += $productEncargo['price'] * $productEncargo['quantity'];
-                    $this->productEncargoRepository->create($productEncargo);
-                }
-                $amount += $encargo->delivery_fee;
-                $amountWithTax = $amount + ($amount * $encargo->tax / 100);
-                $charge = $user->charge((int) ($amountWithTax * 100), ['source' => $stripeToken]);
-                $payment = $this->paymentRepository->create([
-                    "user_id" => $input['user_id'],
-                    "description" => trans("lang.payment_encargo_done"),
-                    "price" => $amountWithTax,
-                    "status" => $charge->status, // $charge->status
-                    "method" => $input['payment']['method'],
-                ]);
-                $this->encargoRepository->update(['payment_id' => $payment->id], $encargo->id);
-
-                $this->cartRepository->deleteWhere(['user_id' => $encargo->user_id]);
-
-                Notification::send($encargo->productEncargos[0]->product->market->users, new NewEncargo($encargo));
-            }
-        } catch (ValidatorException $e) {
-            return $this->sendError($e->getMessage());
-        }
-
-        return $this->sendResponse($encargo->toArray(), __('lang.saved_successfully', ['operator' => __('lang.encargo')]));
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse|mixed
-     */
-    private function cashPayment(Request $request)
-    {
-        $input = $request->all();
-        $amount = 0;
-        try {
-            $encargo = $this->encargoRepository->create(
-                $request->only('user_id', 'encargo_status_id', 'tax', 'delivery_address_id', 'delivery_fee', 'hint')
-            );
-            Log::info($input['products']);
-            foreach ($input['products'] as $productEncargo) {
-                $productEncargo['encargo_id'] = $encargo->id;
-                $amount += $productEncargo['price'] * $productEncargo['quantity'];
-                $this->productEncargoRepository->create($productEncargo);
-            }
-            $amount += $encargo->delivery_fee;
-            $amountWithTax = $amount + ($amount * $encargo->tax / 100);
-            $payment = $this->paymentRepository->create([
-                "user_id" => $input['user_id'],
-                "description" => trans("lang.payment_encargo_waiting"),
-                "price" => $amountWithTax,
-                "status" => 'Waiting for Client',
-                "method" => $input['payment']['method'],
-            ]);
-
-            $this->encargoRepository->update(['payment_id' => $payment->id], $encargo->id);
-
-            $this->cartRepository->deleteWhere(['user_id' => $encargo->user_id]);
-
-            Notification::send($encargo->productEncargos[0]->product->market->users, new NewEncargo($encargo));
-
-        } catch (ValidatorException $e) {
-            return $this->sendError($e->getMessage());
-        }
-
-        return $this->sendResponse($encargo->toArray(), __('lang.saved_successfully', ['operator' => __('lang.encargo')]));
-    }
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse|mixed
@@ -296,7 +192,9 @@ class EncargoAPIController extends Controller
                         'nombre_mandadito_b',
                         'tel_movil_mandadito_b',
                         'direccion_mandadito_b',
-                        'order_number_fac'
+                        'order_number_fac',
+                        'driver_id',
+                        'urls_img_a'
                     )
                 );
 
@@ -311,10 +209,15 @@ class EncargoAPIController extends Controller
             $this->encargoRepository->update(['payment_id' => $payment->id], $encargo->id);
             Flash::success('Nuevo encargo creado. Es necesario que fuera asignado');
 
-            // $this->cartRepository->deleteWhere(['user_id' => $encargo->user_id]);
+            $usersAdmin = $this->userRepository->where('isAdmin', '=', '1')->get();
+            Notification::send($usersAdmin, new NewEncargo($encargo));
 
-            // Notification::send($this->userRepository, new NewEncargo($encargo));
-
+            if (isset($input['driver_id'])) {
+                $driver = $this->userRepository->findWithoutFail($input['driver_id']);
+                if (!empty($driver)) {
+                    Notification::send([$driver], new AssignedEncargo($encargo));
+                }
+            }
         } catch (ValidatorException $e) {
             return $this->sendError($e->getMessage());
         }
@@ -338,6 +241,7 @@ class EncargoAPIController extends Controller
             return $this->sendError('Encargo not found');
         }
         $oldStatus = $oldEncargo->payment->status;
+
         $input = $request->all();
 
         try {
@@ -345,7 +249,7 @@ class EncargoAPIController extends Controller
             if (isset($input['active'])) {
                 $encargo['active'] = $input['active'];
             }
-            if (isset($input['encargo_status_id']) && $input['encargo_status_id'] == 5 && !empty($encargo)) {
+            if (isset($input['encargo_status_id']) && $input['encargo_status_id'] == 4 && !empty($encargo)) {
                 $this->paymentRepository->update(['status' => 'Paid'], $encargo['payment_id']);
             }
             event(new EncargosChangedEvent($oldStatus, $encargo));
@@ -369,6 +273,7 @@ class EncargoAPIController extends Controller
 
         return $this->sendResponse($encargo->toArray(), __('lang.saved_successfully', ['operator' => __('encargo')]));
     }
+
     private function paymentFac(Request $request)
     {
         $paymentTmp = $request->only('payment');
@@ -410,7 +315,9 @@ class EncargoAPIController extends Controller
                         'nombre_mandadito_b',
                         'tel_movil_mandadito_b',
                         'direccion_mandadito_b',
-                        'order_number_fac'
+                        'order_number_fac',
+                        'driver_id',
+                        'urls_img_a'
                     )
                 );
             // return $encargo;
@@ -427,10 +334,15 @@ class EncargoAPIController extends Controller
             $this->encargoRepository->update(['payment_id' => $payment->id], $encargo->id);
             Flash::success('Nuevo encargo creado. Es necesario que sea asignado');
 
-            // $this->cartRepository->deleteWhere(['user_id' => $encargo->user_id]);
+            $usersAdmin = $this->userRepository->where('isAdmin', '=', '1')->get();
+            Notification::send($usersAdmin, new NewEncargo($encargo));
 
-            // Notification::send($this->userRepository, new NewEncargo($encargo));
-
+            if (isset($input['driver_id'])) {
+                $driver = $this->userRepository->findWithoutFail($input['driver_id']);
+                if (!empty($driver)) {
+                    Notification::send([$driver], new AssignedEncargo($encargo));
+                }
+            }
         } catch (ValidatorException $e) {
             return $this->sendError($e->getMessage());
         }

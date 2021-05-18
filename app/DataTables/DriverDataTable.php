@@ -39,9 +39,9 @@ class DriverDataTable extends DataTable
             ->editColumn('delivery_fee', function ($driver) {
                 return $driver->delivery_fee . "%";
             })
-            ->editColumn('available', function ($driver) {
-                return getBooleanColumn($driver, 'available');
-            })
+            // ->editColumn('available', function ($driver) {
+            //     return getBooleanColumn($driver, 'available');
+            // })
             ->addColumn('action', 'drivers.datatables_actions')
             ->rawColumns(array_merge($columns, ['action']));
 
@@ -76,11 +76,11 @@ class DriverDataTable extends DataTable
                 'title' => trans('lang.driver_earning'),
 
             ],
-            [
-                'data' => 'available',
-                'title' => trans('lang.driver_available'),
+            // [
+            //     'data' => 'available',
+            //     'title' => trans('lang.driver_available'),
 
-            ],
+            // ],
             [
                 'data' => 'updated_at',
                 'title' => trans('lang.driver_updated_at'),

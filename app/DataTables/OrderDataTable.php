@@ -35,19 +35,44 @@ class OrderDataTable extends DataTable
         $columns = array_column($this->getColumns(), 'data');
         $dataTable = $dataTable
             ->editColumn('id', function ($order) {
-                return "#".$order->id;
+                return "#" . $order->id;
             })
+            ->editColumn('market_name', function ($order) {
+                return $order->productOrders[0]->product->market->name;
+            })
+           
             ->editColumn('updated_at', function ($order) {
                 return getDateColumn($order, 'updated_at');
             })
             ->editColumn('delivery_fee', function ($order) {
                 return getPriceColumn($order, 'delivery_fee');
             })
-            ->editColumn('tax', function ($order) {
-                return $order->tax . "%";
-            })
+            // ->editColumn('tax', function ($order) {
+            //     return $order->tax . "%";
+            // })
             ->editColumn('payment.status', function ($order) {
-                return getPayment($order->payment,'status');
+                return getPayment($order->payment, 'status');
+            })
+            ->editColumn('driver_name', function ($order) {
+                if ($order->driver_id != null) {
+                    if ($order->driver_id != 0) {
+                        return "<span class='badge badge-success'>" . $order->driver->name . " </span>";
+
+                    } else {
+                        return "<span class='badge badge-danger'> Sin repartidor </span>";
+                    }
+                } else {
+
+                    if ($order->driver_id != 0) {
+                        return "<span class='badge badge-danger'> Sin repartidor (buscando) </span>";
+                    } else {
+                        return "<span class='badge badge-danger'> Sin repartidor </span>";
+                    }
+                }
+            })
+            // Estado del repartidor
+            ->editColumn('order_status_id', function ($order) {
+                return getStatusDriver($order->order_status_id, $order->driver_accept);
             })
             ->editColumn('active', function ($product) {
                 return getBooleanColumn($product, 'active');
@@ -71,24 +96,31 @@ class OrderDataTable extends DataTable
                 'title' => trans('lang.order_id'),
 
             ],
+
             [
-                'data' => 'user.name',
-                'name' => 'user.name',
-                'title' => trans('lang.order_user_id'),
+                'data' => 'market_name',
+                'title' => trans('Establecimiento'),
 
             ],
+
+            // [
+            //     'data' => 'user.name',
+            //     'name' => 'user.name',
+            //     'title' => trans('lang.order_user_id'),
+
+            // ],
             [
                 'data' => 'order_status.status',
                 'name' => 'orderStatus.status',
                 'title' => trans('lang.order_order_status_id'),
 
             ],
-            [
-                'data' => 'tax',
-                'title' => trans('lang.order_tax'),
-                'searchable' => false,
+            // [
+            //     'data' => 'tax',
+            //     'title' => trans('lang.order_tax'),
+            //     'searchable' => false,
 
-            ],
+            // ],
             [
                 'data' => 'delivery_fee',
                 'title' => trans('lang.order_delivery_fee'),
@@ -96,6 +128,7 @@ class OrderDataTable extends DataTable
 
             ],
             [
+
                 'data' => 'payment.status',
                 'name' => 'payment.status',
                 'title' => trans('lang.payment_status'),
@@ -105,6 +138,18 @@ class OrderDataTable extends DataTable
                 'data' => 'payment.method',
                 'name' => 'payment.method',
                 'title' => trans('lang.payment_method'),
+
+            ],
+            [
+                'data' => 'driver_name',
+                'title' => trans('Repartidor'),
+
+            ],
+            // Estado del repartidor
+            [
+                'data' => 'order_status_id',
+                'name' => 'order_status_id',
+                'title' => 'Estado del repartidor',
 
             ],
             [
@@ -118,7 +163,7 @@ class OrderDataTable extends DataTable
                 'searchable' => false,
                 'orderable' => true,
 
-            ]
+            ],
         ];
 
         $hasCustomField = in_array(Order::class, setting('custom_field_models', []));
@@ -180,13 +225,13 @@ class OrderDataTable extends DataTable
         return $this->builder()
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->addAction(['title'=>trans('lang.actions'),'width' => '80px', 'printable' => false, 'responsivePriority' => '100'])
+            ->addAction(['title' => trans('lang.actions'), 'width' => '80px', 'printable' => false, 'responsivePriority' => '100'])
             ->parameters(array_merge(
                 [
                     'language' => json_decode(
                         file_get_contents(base_path('resources/lang/' . app()->getLocale() . '/datatable.json')
                         ), true),
-                    'order' => [ [0, 'desc'] ],
+                    'order' => [[0, 'desc']],
                 ],
                 config('datatables-buttons.parameters')
             ));

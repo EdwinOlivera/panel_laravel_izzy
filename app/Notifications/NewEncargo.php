@@ -57,11 +57,12 @@ class NewEncargo extends Notification
     {
         $message = new FcmMessage();
         $notification = [
-            'title'        => "Nuevo Encargo #".$this->encargo->id." hacia ".$this->encargo->direccion_b,
-            'body'         => $this->encargo->user->name,
+            'title'        => "Nuevo Mandadito #".$this->encargo->id." hacia ".$this->encargo->direccion_b,
+            'body'         =>  "Dirección A: ".$this->encargo->direccion_a.", Dirección B: ".$this->encargo->direccion_b,
+
             // 'icon'         => $this->encargo->productOrders[0]->product->market->getFirstMediaUrl('image', 'thumb'),
             'click_action' => "FLUTTER_NOTIFICATION_CLICK",
-            'id' => '1',
+            'id' => 'Pedidos',
             'status' => 'done',
         ];
         $message->content($notification)->data($notification)->priority(FcmMessage::PRIORITY_HIGH);

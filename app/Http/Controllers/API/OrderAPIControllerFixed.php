@@ -14,9 +14,13 @@ use App\Criteria\Orders\OrdersOfUserCriteria;
 use App\Events\OrderChangedEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Notifications\AcepptedAndAssignedOrder;
 use App\Notifications\AssignedOrder;
 use App\Notifications\NewOrder;
+use App\Notifications\NotifyDriver;
+use App\Notifications\OrderAccepted;
 use App\Notifications\OrderNoAccept;
+use App\Notifications\OrderRejected;
 use App\Notifications\StatusChangedOrder;
 use App\Repositories\CartRepository;
 use App\Repositories\MarketRepository;
@@ -27,6 +31,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
 use App\Repositories\ProductOrderRepository;
 use App\Repositories\UserRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -189,7 +194,9 @@ class OrderAPIControllerFixed extends Controller
         }
 
         if (empty($order)) {
-            return $this->sendError('Orden especifica no encontrada');
+            // return $this->sendError('Orden especifica no encontrada');
+            return $this->sendResponse([], 'Orden especifica no encontrada');
+
         } else {
             $orderArray = $order->toArray();
 
@@ -213,12 +220,12 @@ class OrderAPIControllerFixed extends Controller
                         $productOrder['product']['optiongroups'] = $productOrder['optiongroups'];
                         foreach ($productOrder['product']['optiongroups'] as $optionGroups) {
                             if (!in_array($optionGroups['id'], $idsOptionGroups)) {
-                                $idsOptionGroups [] = $optionGroups['id'];
+                                $idsOptionGroups[] = $optionGroups['id'];
                             }
                         }
 
                         $optionGroupsRaw = DB::table('option_groups')->whereIn('id', $idsOptionGroups)->get()->toArray();
-                        $productOrder['product']['optiongroups'] =$optionGroupsRaw;
+                        $productOrder['product']['optiongroups'] = $optionGroupsRaw;
                     }
 
                     $idsOptions = [];
@@ -253,11 +260,74 @@ class OrderAPIControllerFixed extends Controller
                     $productOrderArrayFinal[] = $productOrder;
                     $orderArray['product_orders'] = $productOrderArrayFinal;
 
+                    if (isset($request['crono'])) {
+                        if ($request['crono']) {
+                            $tiempoAContar = 00;
+                            if (isset($request['desdeNotificaciones'])) {
+                                $tiempoAContar = 30;
+                            }
+
+                            $timeNow = Carbon::now();
+                            $timeUpdate = $order->updated_at;
+
+                            $minutosActuales = $timeNow->format('i');
+                            $segundosActuales = $timeNow->format('s');
+
+                            $minutosPasados = $timeUpdate->format('i');
+                            $segundosPasados = $timeUpdate->format('i');
+
+                            if ($minutosActuales == $minutosPasados) {
+                                if ($segundosActuales > $segundosPasados) {
+                                    $tiempoAContar = $segundosActuales - $segundosPasados;
+                                    if ($tiempoAContar >= 40) {
+                                        $tiempoAContar = 0;
+                                    } else {
+                                        $tiempoAContar = 33 - $tiempoAContar;
+                                    }
+                                }
+                            } else if ($minutosActuales - 1 == $minutosPasados) {
+                                if ($minutosActuales > $minutosPasados) {
+                                    if ($segundosActuales <= $segundosPasados) {
+                                        $tiempoAContar = $segundosPasados - $segundosActuales;
+                                        if ($tiempoAContar <= 30) {
+                                            $tiempoAContar = 0;
+                                        } else {
+                                            $tiempoAContar = $tiempoAContar - 30;
+                                        }
+                                    } else {
+                                        $tiempoAContar = 1;
+                                    }
+                                }
+                            } else {
+                                if (isset($request['desdeNotificaciones'])) {
+                                    if (!$orderArray['driver_accept']) {
+                                        $tiempoAContar = 10;
+                                    } else {
+
+                                        $tiempoAContar = 1;
+                                    }
+                                } else {
+
+                                    $tiempoAContar = 0;
+                                }
+                            }
+                            if ($orderArray['driver_accept']) {
+                                $tiempoAContar = 1;
+                            }
+                            $orderArray['timer'] = $tiempoAContar;
+                        }
+                    }
+
                 }
             }
 
         }
-
+        if (isset($request['test'])) {
+            $orderArray['sono'] =  true;
+            // return $order->productOrders[0]->product->market->users;
+            // Pruebas rapida de notificaciones para los gerentes
+            Notification::send($order->productOrders[0]->product->market->users, new NewOrder($order));
+        }
         return $this->sendResponse($orderArray, 'Orden especifica conseguida');
 
     }
@@ -336,9 +406,9 @@ class OrderAPIControllerFixed extends Controller
                 ]);
                 $this->orderRepository->update(['payment_id' => $payment->id], $order->id);
 
-                // $this->cartRepository->deleteWhere(['user_id' => $order->user_id]);
+                $this->cartRepository->deleteWhere(['user_id' => $order->user_id]);
 
-                // Notification::send($order->productOrders[0]->product->market->users, new NewOrder($order));
+                Notification::send($order->productOrders[0]->product->market->users, new NewOrder($order));
             }
         } catch (ValidatorException $e) {
             return $this->sendError($e->getMessage());
@@ -366,7 +436,7 @@ class OrderAPIControllerFixed extends Controller
                     'instructionProduct',
                     'instructionGeneral',
                     'rtn_user',
-                    'mapa_fechas_cambio', 'carts')
+                    'mapa_fechas_cambio', 'carts','discount')
             );
             Log::info($input['products']);
             foreach ($input['products'] as $productOrder) {
@@ -436,7 +506,6 @@ class OrderAPIControllerFixed extends Controller
                                                             'quantity' => $quantityArray[$idOption],
                                                             'unique_identify' => $productOrder['unique_identify'],
                                                         ]);
-
                                                 } else {
                                                     DB::table('product_order_options')->insert([
                                                         'option_id' => $idOption,
@@ -483,7 +552,7 @@ class OrderAPIControllerFixed extends Controller
                     'instructionProduct',
                     'instructionGeneral',
                     'rtn_user',
-                    'mapa_fechas_cambio', 'carts')
+                    'mapa_fechas_cambio', 'carts','discount')
             );
             Log::info($input['products']);
             foreach ($input['products'] as $productOrder) {
@@ -598,7 +667,6 @@ class OrderAPIControllerFixed extends Controller
         if (empty($oldOrder)) {
             return $this->sendError('Orden a actualizar no fue encontrada');
         }
-
         $oldStatus = $oldOrder->payment->status;
         $input = $request->all();
 
@@ -617,8 +685,39 @@ class OrderAPIControllerFixed extends Controller
             event(new OrderChangedEvent($oldStatus, $order));
 
             if (setting('enable_notifications', false)) {
-                if (isset($input['order_status_id']) && $input['order_status_id'] != $oldOrder->order_status_id) {
-                    Notification::send([$order->user], new StatusChangedOrder($order));
+
+                if (isset($input['acepptedAndAssignedOrder'])) {
+                    if ($input['acepptedAndAssignedOrder']) {
+                        Notification::send([$order->user], new AcepptedAndAssignedOrder($order));
+                    }
+                } else {
+                    if (isset($input['order_status_id']) && $input['order_status_id'] != $oldOrder->order_status_id) {
+                        Notification::send([$order->user], new StatusChangedOrder($order));
+                    }
+                    if (isset($input['accepted']) && $input['accepted'] != $oldOrder->accepted) {
+                        if ($input['accepted'] == true) {
+                            Notification::send([$order->user], new OrderAccepted($order));
+                        }
+                    }
+                }
+
+                if (isset($input['NotifyDriver']) && isset($input['driver_id'])) {
+                    $driver = $this->userRepository->findWithoutFail($input['driver_id']);
+                    if (!empty($driver)) {
+                        Notification::send([$driver], new NotifyDriver($order));
+                    }
+                }
+
+                if (isset($input['explanatory_message']) && $input['explanatory_message'] != null) {
+                    Notification::send([$order->user], new OrderRejected($order));
+                }
+
+                if (isset($input['test'])) {
+                    // Esto es para hacer pruebas rapidas de notificaciones
+                    $driver = $this->userRepository->findWithoutFail($input['driver_id']);
+                    if (!empty($driver)) {
+                        Notification::send([$driver], new AssignedOrder($order));
+                    }
                 }
 
                 if (isset($input['driver_id']) && ($input['driver_id'] != $oldOrder['driver_id'])) {
@@ -631,7 +730,6 @@ class OrderAPIControllerFixed extends Controller
         } catch (ValidatorException $e) {
             return $this->sendError($e->getMessage());
         }
-
         return $this->sendResponse($order->toArray(), __('lang.saved_successfully', ['operator' => __('lang.order')]));
     }
     public function revisarOrden(Request $request)
@@ -693,20 +791,24 @@ class OrderAPIControllerFixed extends Controller
                 } else {
                     return $this->sendResponse([], 'Orden No encotrada');
                 }
-
             } else {
                 return $this->sendResponse([], 'Establecimiento no encontrado');
 
             }
+
+            sleep(42);
             $request['whith'] = "user;productOrders;productOrders.product;productOrders.options;productOrders.optiongroups;orderStatus;deliveryAddress;payment";
             $this->orderRepository->pushCriteria(new RequestCriteria($request));
 
             $order = $this->orderRepository->findWithoutFail($idOrder);
             $orderArray = $order->toArray();
             if (!$orderArray['driver_accept']) {
-                //  "with": "user;productOrders;productOrders.product;productOrders.options;productOrders.optiongroups;orderStatus;deliveryAddress;payment"
-                Notification::send($order->productOrders[0]->product->market->users, new OrderNoAccept($order));
-                $input['driver_id'] = '0';
+
+                $usersAdmin = $this->userRepository->where('isAdmin', '=', '1')->get();
+
+                Notification::send($usersAdmin, new OrderNoAccept($order));
+                $input['driver_id'] = 0;
+                $input['nobody_accepted'] = 1;
                 $order = $this->orderRepository->update($input, $idOrder);
                 //
             }
@@ -725,6 +827,26 @@ class OrderAPIControllerFixed extends Controller
             $statusFinal = true;
             $order = $this->orderRepository->findWithoutFail($idOrder);
             if ($order->driver_accept) {
+                $statusFinal = true;
+            } else {
+                $statusFinal = false;
+            }
+
+            return $this->sendResponse(['status' => $statusFinal], 'Orden Revisada');
+        } else {
+            return $this->sendError('No se especifico el ID de la orden');
+
+        }
+    }
+
+    public function checkStatusOrderUser(Request $request)
+    {
+        $input = $request->all();
+        if (isset($input['order_id'])) {
+            $idOrder = $input['order_id'];
+            $statusFinal = true;
+            $order = $this->orderRepository->findWithoutFail($idOrder);
+            if ($order->driver_accept || $order->accept) {
                 $statusFinal = true;
             } else {
                 $statusFinal = false;

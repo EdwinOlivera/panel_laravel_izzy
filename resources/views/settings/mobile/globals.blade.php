@@ -169,6 +169,33 @@
                     </div>
                 </div>
 
+                <h5 class="col-12 pb-4 custom-field-container " style="color: red"><i class="mr-3 fa fa-key" style="color: red"></i>{!!
+                    trans('App fuera de servicio temporalmente (No afecta a: Izzy-Store e Izzy - Driver)') !!}</h5>
+
+                <!-- message_app_off_line Field -->
+                <div class="form-group row col-12">
+                    {!! Form::label('message_app_off_line', trans('Mensaje'), ['class' => 'col-2
+                    control-label text-right','style'=>"color: red"]) !!}
+                    <div class="col-10">
+                        {!! Form::text('message_app_off_line', setting('message_app_off_line',
+                        'Estamos actualizando el sistema, por los momentos el nuestros servicios no esta disponible'), ['class' => 'form-control', 'placeholder' =>
+                        trans('Estamos actualizando el sistema, por los momentos el nuestros servicios no esta disponible')]) !!}
+                        <div class="form-text text-muted">
+                            {!! trans('Mensaje explicativo del porque el app no estara disponible.') !!}
+                        </div>
+                    </div>
+                </div>
+                <!-- 'Boolean App Off Line' -->
+                <div class="form-group row col-8">
+                    {!! Form::label('app_off_line', trans('App fuera de servicio'),  ['class' => 'col-4  control-label text-right','style'=>"color: red"  ]) !!}
+                    <div class="checkbox icheck">
+                        <label class="w-100 ml-2 form-check-inline">
+                            {!! Form::hidden('app_off_line', null) !!}
+                            {!! Form::checkbox('app_off_line', 1, setting('app_off_line', false)) !!}
+                        </label>
+                    </div>
+                </div>
+
                 <h5 class="col-12 pb-4 custom-field-container"><i class="mr-3 fa fa-mobile-phone"></i>{!!
                     trans('lang.app_setting_version') !!}</h5>
 

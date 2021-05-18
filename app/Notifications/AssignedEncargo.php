@@ -57,8 +57,8 @@ class AssignedEncargo extends Notification
     {
         $message = new FcmMessage();
         $notification = [
-            'title' => "Encargo #" . $this->encargo->id . " de " . $this->encargo->user->name ." Se le ha asignado a usted",
-            'text'         => $this->encargo->direccion_a,
+            'title' => "Mandadtio #" . $this->encargo->id . " de " . $this->encargo->user->name ." Se te ha asignado",
+            'body'  => "Dirección A: ".$this->encargo->direccion_a.", Dirección B: ".$this->encargo->direccion_b,
             'current_order_id' => $this->encargo->id,
 
             // 'image' => $this->encargo->productOrders[0]->product->market->getFirstMediaUrl('image', 'thumb'),
@@ -66,7 +66,7 @@ class AssignedEncargo extends Notification
         ];
         $data = [
             'click_action' => "FLUTTER_NOTIFICATION_CLICK",
-            'id' => '1',
+            'id' => 'Pedidos',
             'status' => 'done',
             'message' => $notification,
         ];

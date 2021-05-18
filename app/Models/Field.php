@@ -30,6 +30,8 @@ class Field extends Model implements HasMedia
         'description',
         'index_relevance',
         'message',
+        'active',
+        'message_closed',
 
     ];
 
@@ -40,6 +42,7 @@ class Field extends Model implements HasMedia
      */
     protected $casts = [
         'name' => 'string',
+        'active' => 'boolean',
         'description' => 'string',
         'image' => 'string',
         'index_relevance' => 'int',

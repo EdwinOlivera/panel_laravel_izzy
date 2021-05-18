@@ -30,6 +30,8 @@ class Cart extends Model
         'establecimiento',
         'enable_factura',
         'quantity',
+        'coupon_valid',
+
     ];
 
     /**
@@ -44,6 +46,8 @@ class Cart extends Model
         'price_select' => 'double',
         'total_pay' => 'double',
         'quantity' => 'integer',
+        'coupon_valid' => "boolean",
+
     ];
 
     /**

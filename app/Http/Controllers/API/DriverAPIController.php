@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-
+use App\Criteria\Drivers\NearCriteriaDriver;
+use App\Http\Controllers\Controller;
 use App\Models\Driver;
 use App\Repositories\DriverRepository;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Response;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
-use Illuminate\Support\Facades\Response;
 use Prettus\Repository\Exceptions\RepositoryException;
-use Flash;
 
 /**
  * Class DriverController
@@ -37,9 +36,16 @@ class DriverAPIController extends Controller
      */
     public function index(Request $request)
     {
-        try{
+        try {
             $this->driverRepository->pushCriteria(new RequestCriteria($request));
             $this->driverRepository->pushCriteria(new LimitOffsetCriteria($request));
+            if ($request->has(['myLon', 'myLat', 'areaLon', 'areaLat'])) {
+                $this->driverRepository->pushCriteria(new NearCriteriaDriver($request));
+            }
+
+            if ($request->has(['myLon', 'myLat', 'longPuntoA', 'latPuntoA'])) {
+                $this->driverRepository->pushCriteria(new NearCriteriaDriver($request));
+            }
         } catch (RepositoryException $e) {
             return $this->sendError($e->getMessage());
         }

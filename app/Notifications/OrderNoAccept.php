@@ -57,8 +57,8 @@ class OrderNoAccept extends Notification
     {
         $message = new FcmMessage();
         $notification = [
-            'title'        => "Pedido #".$this->order->id." no fue tomado por ningún repartidor ",
-            'body'         => 'Informar que no ningún repartidor ha aceptado el pedido.',
+            'title'        => "Pedido #".$this->order->id." no fue tomado.",
+            'body'         => 'Ningún repartidor tomó la orden, favor asignarla desde el dashboard.',
             'icon'         => $this->order->productOrders[0]->product->market->getFirstMediaUrl('image', 'thumb'),
             'click_action' => "FLUTTER_NOTIFICATION_CLICK",
             'id' => '1',

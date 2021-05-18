@@ -50,11 +50,12 @@
             </div>
         </div>
     </div>
-{{-- distance_per_extra --}}
+
+    {{-- distance_per_extra --}}
     <div class="form-group row ">
         {!! Form::label('distance_per_extra', trans("lang.distance_per_extra"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
-            {!! Form::number('distance_per_extra', null,  ['class' => 'form-control',"min = 3",'step'=>'any','placeholder'=>  trans("lang.distance_per_extra_placeholder")]) !!}
+            {!! Form::number('distance_per_extra', null,  ['class' => 'form-control',"min = 0",'step'=>'any','placeholder'=>  trans("lang.distance_per_extra_placeholder")]) !!}
             <div class="form-text text-muted">
                 {{ trans("lang.distance_per_extra_help") }}
             </div>
@@ -150,7 +151,7 @@
     </div>
     <!-- 'Boolean closed Field' -->
     <div class="form-group row ">
-        {!! Form::label('closed', trans("lang.market_closed"),['class' => 'col-5 control-label text-right']) !!}
+        {!! Form::label('closed', trans("lang.market_closed"),['class' => 'col-3 control-label text-right']) !!}
         <div class="checkbox icheck">
             <label class="col-9 ml-2 form-check-inline">
                 {!! Form::hidden('closed', 0) !!}
@@ -177,6 +178,17 @@
                 {!! Form::hidden('enable_extra_amount', 0) !!}
                 {!! Form::checkbox('enable_extra_amount', 1, null) !!}
             </label>
+        </div>
+    </div>
+
+    <!-- Message closed Field -->
+    <div class="form-group row ">
+        {!! Form::label('message_closed', trans("Mensaje al estar cerrado"), ['class' => 'col-3 control-label text-right']) !!}
+        <div class="">
+            {!! Form::text('message_closed', null,  ['class' => 'form-control','placeholder'=>  trans("En estos momentos estamos cerrados. El día de mañana tomaremos tu pedido con mucho gusto.")]) !!}
+            <div class="form-text text-muted">
+                {{ trans("Mensaje que se mostrara cuando este cerrado el establecimiento") }}
+            </div>
         </div>
     </div>
 </div>
@@ -263,7 +275,7 @@
         <div class="form-group row ">
             {!! Form::label('hour_open', trans("Hora de Apertura"), ['class' => 'col-3 control-label text-right']) !!}
             <div class="col-6">
-                {!! Form::number('hour_open', null,  ['class' => 'form-control', 'min=1','max=12' ,'step'=>'any','placeholder'=>  trans("7 = 7 am/pm")]) !!}
+                {!! Form::time('hour_open', null,  ['class' => 'form-control', "min" => "01:00", "max" => "12:00" ,'step'=>'300','placeholder'=>  trans("7 = 7 am/pm")]) !!}
                 <div class="form-text text-muted">
                     {{ trans("Ingresar la hora de apertura") }}
                 </div>
@@ -276,7 +288,7 @@
                 <div class="checkbox icheck">
                     <label class="col-9 ml-2 form-check-inline">
                         {!! Form::hidden('open_pm', 0) !!}
-                        {!! Form::checkbox('open_pm', 1, null) !!}
+                        {!! Form::checkbox('open_pm', 0, null) !!}
                     </label>
                 </div>
             </div>
@@ -286,7 +298,8 @@
         <div class="form-group row ">
             {!! Form::label('hour_close', trans("Hora de Cierre"), ['class' => 'col-3 control-label text-right']) !!}
             <div class="col-6">
-                {!! Form::number('hour_close', null,  ['class' => 'form-control', 'min=1','max=12' ,'step'=>'any','placeholder'=>  trans("7 = 7 am/pm")]) !!}
+                {!! Form::time('hour_close', null,  ['class' => 'form-control', "min" => "01:00", "max" => "12:00" ,'step'=>'300' ,'placeholder'=>  trans("7 = 7 am/pm")]) !!}
+                {{-- <input id="hour_close" name="hour_close" class="form-control" type="time"  min="01:00" max="12:00" step="600"> --}}
                 <div class="form-text text-muted">
                     {{ trans("Ingresar la hora de Cierre") }}
                 </div>

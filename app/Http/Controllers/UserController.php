@@ -257,6 +257,8 @@ class UserController extends Controller
             $input['password'] = Hash::make($input['password']);
         }
         try {
+            $input['isAdmin'] = 0;
+
             if(isset($input['roles'][0]) && $input['roles'][0]){
                 if( $input['roles'][0] == 'admin')
                     $input['isAdmin'] = 1;

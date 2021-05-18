@@ -20,7 +20,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{!! url('settings/payment/payment') !!}"><i class="fa fa-money mr-2"></i>{{trans('lang.app_setting_payment')}}</a>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link " href="{!! url('settings/payment/paypal') !!}"><i class="fa fa-paypal mr-2"></i>{{trans('lang.app_setting_paypal')}}@if(setting('enable_paypal', false))<span class="badge ml-2 badge-success">{{trans('lang.active')}}</span>@endif</a>
                 </li>
                 <li class="nav-item">
@@ -30,7 +30,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{!! url('settings/payment/razorpay') !!}"><i class="fa fa-envelope-o mr-2"></i>{{trans('lang.app_setting_razorpay')}}@if(setting('enable_razorpay',false))<span class="badge ml-2 badge-success">{{trans('lang.active')}}</span>@endif
                     </a>
-                </li>
+                </li> --}}
 
                  {{-- enable_fac --}}
                  <li class="nav-item">
@@ -62,7 +62,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-group row col-12">
+                    {{-- <div class="form-group row col-12">
                         {!! Form::label('enable_fac_3d_secure', trans('lang.app_setting_enable_fac_3d_secure'),['class' => 'col-3 control-label text-right']) !!}
                         <div class="checkbox icheck">
                             <label class="w-100 ml-2 form-check-inline">
@@ -71,7 +71,7 @@
                                 <span class="ml-2">{!! trans('lang.app_setting_enable_fac_3d_secure_help') !!}</span>
                             </label>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="form-group row col-12">
                         {!! Form::label('fac_merchant_password', trans('lang.app_setting_fac_password'), ['class' => 'col-3 control-label text-right']) !!}
                         <div class="col-9">
@@ -101,7 +101,7 @@
                         </div>
                     </div>
 {{-- base_url_fac_3d_secure --}}
-                    <div class="form-group row col-12">
+                    {{-- <div class="form-group row col-12">
                         {!! Form::label('base_url_fac_3d_secure', trans('lang.app_setting_fac_base_url_3d_secure'), ['class' => 'col-3 control-label text-right']) !!}
                         <div class="col-9">
                             {!! Form::text('base_url_fac_3d_secure', setting('base_url_fac_3d_secure'),  ['class' => 'form-control','placeholder'=>  trans('lang.app_setting_fac_base_url_3d_secure_placeholder')]) !!}
@@ -109,9 +109,9 @@
                                 {!! trans('lang.app_setting_fac_base_url_3d_secure_help') !!}
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     {{-- url_transaction_modification --}}
-                    {{-- <div class="form-group row col-12">
+                    <div class="form-group row col-12">
                         {!! Form::label('url_transaction_modification', trans('URL: Transaction Modification'), ['class' => 'col-3 control-label text-right']) !!}
                         <div class="col-9">
                             {!! Form::text('url_transaction_modification', setting('url_transaction_modification'),  ['class' => 'form-control','placeholder'=>  trans('ejm: https://ecm.firstatlanticcommerce.com/PGServiceXML/TransactionModification')]) !!}
@@ -119,7 +119,7 @@
                                 {!! trans('Inserte la URL usada para modificar las transacciones cambiar "marlin" por "ecm" para realizar pruebas') !!}
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
                 </div>
 
                 <div style="flex: 30%;max-width: 30%;padding: 0 4px;" class="column">

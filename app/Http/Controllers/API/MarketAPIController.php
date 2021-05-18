@@ -230,7 +230,7 @@ class MarketAPIController extends Controller
             return $this->sendError('Market not found');
         }
         $input = $request->all();
-        // return $input;
+        
         $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->marketRepository->model());
         try {
             $market = $this->marketRepository->update($input, $id);

@@ -71,17 +71,18 @@ class UserAPIController extends Controller
                 'phone' => 'required',
                 'password' => 'required',
             ]);
-            $userFind = User::where('phone', '=', $request->input('phone'))->get();
-            if (isset($userFind[0])) {
-               
+            $verificar = User::where('phone', '=', $request->input('phone'))->exists();
+            if ($verificar) {
+                $userFind = User::where('phone', '=', $request->input('phone'))->get();
+
                 if (auth()->attempt(['email' => $userFind[0]['email'], 'password' => $request->input('password')])) {
                     $user = auth()->user();
                     $user->device_token = $request->input('device_token', '');
-    
+
                     $user->save();
                     return $this->sendResponse($user, 'User retrieved successfully');
-                }else{
-                return $this->sendResponse([], 'Usuario no encontrado');
+                } else {
+                    return $this->sendResponse([], 'Usuario no encontrado');
                 }
             } else {
                 return $this->sendResponse([], 'Usuario no encontrado');
@@ -217,6 +218,8 @@ class UserAPIController extends Controller
                 'message_home' => '',
                 'message_markets_closed' => '',
                 'message_home_markets' => '',
+                'app_off_line' => '',
+                'message_app_off_line' => '',
 
             ]
         );
@@ -301,8 +304,9 @@ class UserAPIController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-            $userFind = User::where('email', $request['email'])->first();
-            if ($userFind) {
+            $Verificar = User::where('email', $request['email'])->exists();
+            if ($Verificar) {
+                $userFind = User::where('email', $request['email'])->first();
                 $user = $this->userRepository->findWithoutFail($userFind->id);
 
                 $user->name = $request['name'];
@@ -353,8 +357,9 @@ class UserAPIController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-            $userFind = User::where('email', $request['email'])->first();
-            if ($userFind) {
+            $Verificar = User::where('email', $request['email'])->exists();
+            if ($Verificar) {
+                $userFind = User::where('email', $request['email'])->first();
                 $user = $this->userRepository->findWithoutFail($userFind->id);
 
                 $user->name = $request['name'];
@@ -401,8 +406,9 @@ class UserAPIController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-            $userFind = User::where('email', $request['email'])->first();
-            if ($userFind) {
+            $Verificar = User::where('email', $request['email'])->exists();
+            if ($Verificar) {
+                $userFind = User::where('email', $request['email'])->first();
                 $user = $this->userRepository->findWithoutFail($userFind->id);
 
                 $user->name = $request['name'];
@@ -454,8 +460,9 @@ class UserAPIController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-            $userFind = User::where('email', $request['email'])->first();
-            if ($userFind) {
+            $Verificar = User::where('email', $request['email'])->exists();
+            if ($Verificar) {
+                $userFind = User::where('email', $request['email'])->first();
                 $user = $this->userRepository->findWithoutFail($userFind->id);
 
                 $user->name = $request['name'];

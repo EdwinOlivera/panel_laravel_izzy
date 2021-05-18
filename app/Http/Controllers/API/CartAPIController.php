@@ -50,19 +50,30 @@ class CartAPIController extends Controller
         foreach ($cartsArray as $cartSingle) {
             $idProduct = $cartSingle['product']['id'];
             $options = $cartSingle['options'];
+            // return $cartSingle;
             $idsOptions = [];
             $optionsFinal = [];
             foreach ($options as $option) {
                 $idsOptions[] = $option['id'];
             }
+            // $algo = DB::table('cart_options')->where('option_id', 4294967295)->pluck('quantity', 'option_group_id');
+            // return $algo;
+            // return $cartSingle['id'];
             $quantityOption = DB::table('cart_options')->whereIn('option_id', $idsOptions)->where('cart_id', '=', $cartSingle['id'])->pluck('quantity', 'option_group_id');
+            // return $quantityOption;
             foreach ($options as $option) {
-                $option['quantity'] = $quantityOption[$option['option_group_id']];
-                $optionsFinal [] = $option;
+                if (isset($quantityOption[$option['option_group_id']])) {
+                    $option['quantity'] = $quantityOption[$option['option_group_id']];
+                    $optionsFinal[] = $option;
+                }else{
+                    $quantitysingleOption = DB::table('cart_options')->where('option_id', $option['id'])->where('cart_id', '=', $cartSingle['id'])->pluck('quantity');
+                    $option['quantity'] = $quantitysingleOption[0];
+                    $optionsFinal[] = $option;
+                }
             }
             $cartSingle['options'] = $optionsFinal;
-            $cartsArrayFinal [] = $cartSingle;
-        
+            $cartsArrayFinal[] = $cartSingle;
+
         }
         return $this->sendResponse($cartsArrayFinal, 'Carritos enviados exitosamente');
     }
@@ -131,15 +142,7 @@ class CartAPIController extends Controller
 
                 // Convert JSON string to Array
                 $quantityArray = json_decode($mapQuantity, true);
-                
-                // $arrayPre = explode("[", $input['optionGroups']);
-                // $arrayPos = explode("]", $arrayPre[1]);
-                // $array = explode(",", $arrayPos[0]);
                 $array = $input['optionGroups'];
-
-                // $arrayPreOption = explode("[", $input['options']);
-                // $arrayPosOption = explode("]", $arrayPreOption[1]);
-                // $arrayOption = explode(",", $arrayPosOption[0]);
                 $arrayOption = $input['options'];
                 $options = [];
                 $optionsGroups = [];
@@ -162,21 +165,14 @@ class CartAPIController extends Controller
                             if ($registro) {
                                 if (isset($input['map_quantity_options'])) {
 
-                                    // print_r($quantityArray);        // Dump all data of the Array
                                     DB::table('cart_options')->where('option_id', '=', $idOption)->where('cart_id', '=', $cart->id)->where('option_group_id', '=', '0')
                                         ->limit(1)
                                         ->update([
                                             "option_group_id" => $idGroupSelect,
                                             'quantity' => $quantityArray[$idOption],
                                         ]);
-                                } else {
-                                    DB::table('cart_options')->where('option_id', '=', $idOption)->where('cart_id', '=', $cart->id)->where('option_group_id', '=', '0')
-                                        ->limit(1)
-                                        ->update([
-                                            "option_group_id" => $idGroupSelect,
-                                        ]);
-                                }
 
+                                }
                             } else {
                                 if (isset($input['map_quantity_options'])) {
                                     // print_r($quantityArray);        // Dump all data of the Array
@@ -186,12 +182,6 @@ class CartAPIController extends Controller
                                         'option_group_id' => $idGroupSelect,
                                         'quantity' => $quantityArray[$idOption],
 
-                                    ]);
-                                } else {
-                                    DB::table('cart_options')->insert([
-                                        'option_id' => $idOption,
-                                        'cart_id' => $cart->id,
-                                        'option_group_id' => $idGroupSelect,
                                     ]);
                                 }
                             }

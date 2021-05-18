@@ -82,6 +82,7 @@ class Market extends Model implements HasMedia
         'estimated_time',
         'enable_extra_amount',
         'type_market_id',
+        'message_closed',
     ];
 
     /**

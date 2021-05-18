@@ -210,7 +210,7 @@ class Product extends Model implements HasMedia
      */
     public function getMarketAttribute()
     {
-        return $this->market()->first(['id', 'name', 'delivery_fee', 'address', 'phone', 'default_tax', 'latitude', 'longitude', 'estimated_time', 'hour_close', 'hour_open']);
+        return $this->market()->first(['id', 'name', 'delivery_fee', 'address', 'phone', 'default_tax', 'latitude', 'longitude', 'estimated_time', 'hour_close', 'hour_open','message_closed','enable_extra_amount','distance_per_extra','extra_amount']);
     }
 
     /**

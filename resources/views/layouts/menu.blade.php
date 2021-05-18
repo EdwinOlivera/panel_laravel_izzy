@@ -448,7 +448,7 @@
                 <a href="{!!  url('settings/mobile/home') !!}"
                     class="nav-link {{ Request::is('settings/mobile/home*') ? 'active' : '' }}">
                     @if ($icons)<i class="nav-icon fa fa-home"></i> @endif
-                    <p>{{ trans('lang.mobile_home') }}
+                    <p>{{ trans('lang.mobile_message') }}
                     </p>
                 </a>
             </li>

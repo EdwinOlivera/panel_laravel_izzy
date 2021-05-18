@@ -63,6 +63,11 @@ class Order extends Model
         'rtn_user',
         'driver_accept',
         'driver_array',
+        'explanatory_message',
+        'cancel_by_user',
+        'nobody_accepted',
+        'discount',
+
     ];
 
     /**
@@ -91,6 +96,9 @@ class Order extends Model
         'active' => 'boolean',
         'extra_amount' => 'double',
         'driver_id' => 'integer',
+        'cancel_by_user' => "boolean",
+        'nobody_accepted' => "boolean",
+        'discount' => 'double',
     ];
 
     /**

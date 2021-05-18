@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\Order;
+use Benwilkins\FCM\FcmMessage;
 use FontLib\Table\Type\name;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Benwilkins\FCM\FcmMessage;
 
 class NewOrder extends Notification
 {
@@ -36,7 +36,7 @@ class NewOrder extends Notification
      */
     public function via($notifiable)
     {
-        return ['database','fcm'];
+        return ['database', 'fcm'];
     }
 
     /**
@@ -57,12 +57,13 @@ class NewOrder extends Notification
     {
         $message = new FcmMessage();
         $notification = [
-            'title'        => "Nueva Orden #".$this->order->id." para ".$this->order->productOrders[0]->product->market->name,
-            'body'         => $this->order->user->name,
+            'title' => "Nuevo Pedido #" . $this->order->id . " para " . $this->order->productOrders[0]->product->market->name,
+            'body' => "Nuevo pedido del usuario ".$this->order->user->name,
             'current_order_id' => $this->order->id,
-            'icon'         => $this->order->productOrders[0]->product->market->getFirstMediaUrl('image', 'thumb'),
+            'icon' => $this->order->productOrders[0]->product->market->getFirstMediaUrl('image', 'thumb'),
             'click_action' => "FLUTTER_NOTIFICATION_CLICK",
-            'id' => '1',
+            'id' => 'Pedidos',
+            'sound' => 'custom_sound',
             'status' => 'done',
         ];
         $message->content($notification)->data($notification)->priority(FcmMessage::PRIORITY_HIGH);
@@ -79,7 +80,7 @@ class NewOrder extends Notification
     public function toArray($notifiable)
     {
         return [
-            'current_order_id'     => $this->order->id,
+            'current_order_id' => $this->order->id,
 
             'order_id' => $this->order['id'],
         ];

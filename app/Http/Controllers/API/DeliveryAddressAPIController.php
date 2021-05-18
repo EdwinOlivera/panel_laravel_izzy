@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryAddress;
+use App\Models\Driver;
 use App\Repositories\DeliveryAddressRepository;
-use Flash;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -80,6 +79,12 @@ class DeliveryAddressAPIController extends Controller
     {
         $uniqueInput = $request->only("address");
         $otherInput = $request->except("address");
+        $input = $request->all();
+        if (isset($input["user_id"]) && isset($input["latitude"]) && isset($input["longitude"])) {
+            $userId = $input["user_id"];
+            Driver::where("user_id", $userId)->update(["latitude" => $input["latitude"], "longitude" => $input["longitude"]]);
+        }
+
         try {
             $deliveryAddress = $this->deliveryAddressRepository->updateOrCreate($uniqueInput, $otherInput);
 
@@ -106,7 +111,13 @@ class DeliveryAddressAPIController extends Controller
             return $this->sendError('Delivery Address not found');
         }
         $input = $request->all();
-        if ($input['is_default'] == true){
+        
+        if (isset($input["user_id"]) && isset($input["latitude"]) && isset($input["longitude"])) {
+            $userId = $input["user_id"];
+            Driver::where("user_id", $userId)->update(["latitude" => $input["latitude"], "longitude" => $input["longitude"]]);
+        }
+
+        if ($input['is_default'] == true) {
             $this->deliveryAddressRepository->initIsDefault($input['user_id']);
         }
         try {
@@ -137,7 +148,7 @@ class DeliveryAddressAPIController extends Controller
 
         $this->deliveryAddressRepository->delete($id);
 
-        return $this->sendResponse($address, __('lang.deleted_successfully',['operator' => __('lang.delivery_address')]));
+        return $this->sendResponse($address, __('lang.deleted_successfully', ['operator' => __('lang.delivery_address')]));
 
     }
 }

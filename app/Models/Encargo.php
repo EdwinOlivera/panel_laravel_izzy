@@ -33,7 +33,7 @@ use Eloquent as Model;
 class Encargo extends Model
 {
     
-    // public $table = 'orders';
+    public $table = 'encargos';
 
 
     public $fillable = [
@@ -75,7 +75,8 @@ class Encargo extends Model
         'nombre_mandadito_b',
         'tel_movil_mandadito_b',
         'direccion_mandadito_b',
-        'order_number_fac'
+        'order_number_fac',
+        'urls_img_a'
         
     ];
 
@@ -103,7 +104,6 @@ class Encargo extends Model
         'descripcion_a' => 'string',
         'hacer_repartidor_b' => 'string',
         'hacer_repartidor_a' => 'string',
-
         'status' => 'string',
         'payment_id' => 'integer',
         'pay_mode' => 'integer',
@@ -114,6 +114,8 @@ class Encargo extends Model
         'pagada'=>'boolean',
         'dentro_rango'=>'boolean',
         'driver_id' => 'integer',
+        'assigned' => 'boolean',
+        
     ];
 
     /**
@@ -122,21 +124,7 @@ class Encargo extends Model
      * @var array
      */
     public static $rules = [
-        // 'direccion_a'=>  'required',
-        // 'lat_a'=>  'required',
-        // 'lng_a'=>  'required',
-        // // 'hacer_repartidor_a'=>  'required',
-        // 'descripcion_a'=>  'required',
-        // 'direccion_b'=>  'required',
-        // 'lat_b'=>  'required',
-        // 'lng_b'=>  'required',
-        // 'descripcion_b'=>  'required',
-        // 'hacer_repartidor_b'=>  'required',
-        
-        // 'user_id' => 'required|exists:users,id',
-        // 'encargo_status_id' => 'required|exists:order_statuses,id',
-        // 'payment_id' => 'exists:payments,id',
-        // 'driver_id' => 'nullable|exists:users,id',
+      
     ];
 
     /**
