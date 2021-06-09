@@ -296,4 +296,21 @@ class CartAPIController extends Controller
 
     }
 
+    
+    /**
+     * Remueve todos los carritos especifico de una usuaroo.
+     *
+     * @param int $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroyAll($id)
+    {
+
+        $this->cartRepository->deleteWhere(['user_id' => $id]);
+
+        return $this->sendResponse([], __('Borrados todos los ', ['operator' => __('lang.cart')]));
+
+    }
+
 }

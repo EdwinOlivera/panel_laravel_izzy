@@ -448,7 +448,7 @@
                 <a href="{!!  url('settings/mobile/home') !!}"
                     class="nav-link {{ Request::is('settings/mobile/home*') ? 'active' : '' }}">
                     @if ($icons)<i class="nav-icon fa fa-home"></i> @endif
-                    <p>{{ trans('lang.mobile_message') }}
+                    <p>{{ trans('lang.mobile_home') }}
                     </p>
                 </a>
             </li>
@@ -492,17 +492,16 @@
                 </li>
             @endcan
 
-            <li
-                class="nav-item has-treeview {{ Request::is('settings/permissions*') || Request::is('settings/roles*') ? 'menu-open' : '' }}">
-                <a href="#"
+            <li class="nav-item has-treeview {{ Request::is('settings/permissions*') || Request::is('settings/roles*') ? 'menu-open' : '' }}">
+                {{-- <a href="#"
                     class="nav-link {{ Request::is('settings/permissions*') || Request::is('settings/roles*') ? 'active' : '' }}">
                     @if ($icons)<i class="nav-icon fa fa-user-secret"></i>@endif
                     <p>
                         {{ trans('lang.permission_menu') }}
                         <i class="right fa fa-angle-left"></i>
                     </p>
-                </a>
-                <ul class="nav nav-treeview">
+                </a> --}}
+                {{-- <ul class="nav nav-treeview">
                     <li class="nav-item">
                         <a class="nav-link {{ Request::is('settings/permissions') ? 'active' : '' }}"
                             href="{!!  route('permissions.index') !!}">
@@ -535,11 +534,11 @@
                             <p>{{ trans('lang.role_create') }}</p>
                         </a>
                     </li>
-                </ul>
+                </ul> --}}
 
             </li>
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link {{ Request::is('settings/customFields*') ? 'active' : '' }}"
                     href="{!!  route('customFields.index') !!}">
                     @if ($icons)
@@ -547,7 +546,7 @@
                     @endif
                     <p>{{ trans('lang.custom_field_plural') }}</p>
                 </a>
-            </li>
+            </li> --}}
 
 
             <li class="nav-item">
@@ -557,13 +556,13 @@
                     <p>{{ trans('lang.app_setting_localisation') }}</p>
                 </a>
             </li>
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a href="{!!  url('settings/translation/en') !!}"
                     class="nav-link {{ Request::is('settings/translation*') ? 'active' : '' }}">
                     @if ($icons) <i class="nav-icon fa fa-language"></i> @endif
                     <p>{{ trans('lang.app_setting_translation') }}</p>
                 </a>
-            </li>
+            </li> --}}
             @can('currencies.index')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('settings/currencies*') ? 'active' : '' }}"

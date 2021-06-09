@@ -32,10 +32,10 @@
                     </a>
                 </li> --}}
                 {{-- enable_pixelpay --}}
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link " href="{!! url('settings/payment/pixelpay') !!}"><i class="fa fa-credit-card-alt mr-2"></i>{{trans('lang.app_setting_pixelpay')}}@if(setting('enable_pixelpay',false))<span class="badge ml-2 badge-success">{{trans('lang.active')}}</span>@endif
                     </a>
-                </li> --}}
+                </li>
                  {{-- enable_fac --}}
                  <li class="nav-item">
                     <a class="nav-link" href="{!! url('settings/payment/fac') !!}"><i class="fa fa-university mr-2"></i>{{trans('lang.app_setting_fac')}}@if(setting('enable_fac',false))<span class="badge ml-2 badge-success">{{trans('lang.active')}}</span>@endif

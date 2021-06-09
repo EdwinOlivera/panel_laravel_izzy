@@ -75,8 +75,7 @@ class Encargo extends Model
         'nombre_mandadito_b',
         'tel_movil_mandadito_b',
         'direccion_mandadito_b',
-        'order_number_fac',
-        'urls_img_a'
+        'order_number_fac'
         
     ];
 

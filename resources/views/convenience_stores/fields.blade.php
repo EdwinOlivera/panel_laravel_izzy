@@ -71,7 +71,7 @@
         </div>
     </div>
     <!-- delivery_range Field -->
-    <div class="form-group row ">
+    <!-- <div class="form-group row ">
         {!! Form::label('delivery_range', trans("lang.market_delivery_range"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
             {!! Form::number('delivery_range', null,  ['class' => 'form-control', "min = 0",'step'=>'any','placeholder'=>  trans("lang.market_delivery_range_placeholder")]) !!}
@@ -79,7 +79,7 @@
                 {{ trans("lang.market_delivery_range_help") }}
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- default_tax Field -->
     <div class="form-group row ">

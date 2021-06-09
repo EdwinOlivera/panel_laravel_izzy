@@ -193,8 +193,7 @@ class EncargoAPIController extends Controller
                         'tel_movil_mandadito_b',
                         'direccion_mandadito_b',
                         'order_number_fac',
-                        'driver_id',
-                        'urls_img_a'
+                        'driver_id'
                     )
                 );
 
@@ -211,7 +210,7 @@ class EncargoAPIController extends Controller
 
             $usersAdmin = $this->userRepository->where('isAdmin', '=', '1')->get();
             Notification::send($usersAdmin, new NewEncargo($encargo));
-
+            
             if (isset($input['driver_id'])) {
                 $driver = $this->userRepository->findWithoutFail($input['driver_id']);
                 if (!empty($driver)) {
@@ -241,7 +240,7 @@ class EncargoAPIController extends Controller
             return $this->sendError('Encargo not found');
         }
         $oldStatus = $oldEncargo->payment->status;
-
+        
         $input = $request->all();
 
         try {
@@ -316,8 +315,7 @@ class EncargoAPIController extends Controller
                         'tel_movil_mandadito_b',
                         'direccion_mandadito_b',
                         'order_number_fac',
-                        'driver_id',
-                        'urls_img_a'
+                        'driver_id'
                     )
                 );
             // return $encargo;
@@ -336,7 +334,7 @@ class EncargoAPIController extends Controller
 
             $usersAdmin = $this->userRepository->where('isAdmin', '=', '1')->get();
             Notification::send($usersAdmin, new NewEncargo($encargo));
-
+            
             if (isset($input['driver_id'])) {
                 $driver = $this->userRepository->findWithoutFail($input['driver_id']);
                 if (!empty($driver)) {

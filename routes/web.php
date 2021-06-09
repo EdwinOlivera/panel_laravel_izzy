@@ -32,7 +32,7 @@ Route::get('payments/razorpay', 'RazorPayController@index');
 Route::get('payments/pixelpay', 'PixelPayController@getExpressCheckout')->name('pixelpay.express-checkout');
 Route::get('payments/pixelpay/conversionDatos', 'PixelPayController@conversionDeDatos');
 Route::get('payments/pixelpay/cancelPixelPay', 'PixelPayController@cancelPixelPay');
-Route::get('payments/pixelpay/completePixelPay', 'PixelPayController@completePixelPay');
+Route::get('payments/pixelpay/operacionCompletada', 'PixelPayController@completePixelPay');
 
 //IMPLEMTACIONES DE FAC
 Route::get('payments/fac', 'FACController@processFAC');
@@ -100,6 +100,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('fields', 'FieldController')->except([
         'show',
     ]);
+    Route::get('fields/edit_order', 'FieldController@modificarOrden')->name('edit_order_fields');
+    Route::get('fields/sort', 'FieldController@sortOrden');
+    Route::get('fields/updateFields', 'FieldController@updateFields');
 
     Route::post('markets/remove-media', 'MarketController@removeMedia');
     Route::get('requestedMarkets', 'MarketController@requestedMarkets')->name('requestedMarkets.index'); //adeed
@@ -315,6 +318,7 @@ Route::middleware('auth')->group(function () {
         'show',
     ]);
 
+    Route::get('search/markets', 'MarketController@searchMarkets');
     Route::get('search/sectionesFromMarket', 'SectionController@searchSections');
     Route::get('search/productsFromMarket', 'ProductController@searchProductsFromMarket');
     Route::get('search/departmentFromMarket', 'DepartmentController@searchDepartment');

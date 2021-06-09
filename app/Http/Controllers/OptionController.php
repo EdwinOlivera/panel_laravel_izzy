@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Repositories\CustomFieldRepository;
 use App\Repositories\OptionGroupRepository;
 use App\Repositories\OptionRepository;
+use App\Repositories\MarketRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\UploadRepository;
 use Flash;
@@ -49,11 +50,19 @@ class OptionController extends Controller
      */
     private $optionGroupRepository;
 
-    public function __construct(OptionRepository $optionRepo, CustomFieldRepository $customFieldRepo, UploadRepository $uploadRepo
-        , ProductRepository $productRepo
-        , OptionGroupRepository $optionGroupRepo) {
+        /**
+     * @var MarketRepository
+     */
+    private $marketRepository;
+
+    public function __construct(OptionRepository $optionRepo, CustomFieldRepository $customFieldRepo, UploadRepository $uploadRepo,
+        ProductRepository $productRepo,
+        MarketRepository $marketRepo,
+        OptionGroupRepository $optionGroupRepo) {
         parent::__construct();
         $this->optionRepository = $optionRepo;
+        $this->marketRepository = $marketRepo;
+
         $this->customFieldRepository = $customFieldRepo;
         $this->uploadRepository = $uploadRepo;
         $this->productRepository = $productRepo;
@@ -79,9 +88,7 @@ class OptionController extends Controller
      */
     public function create()
     {
-        // $this->productRepository->pushCriteria(new ProductsOfUserCriteria(auth()->id()));
-        // $product = $this->productRepository->groupedByMarkets();
-        // $optionGroup = $this->optionGroupRepository->pluck('name', 'id');
+        $market = [];
         $product = [];
         $optionGroup = [];
         $hasCustomField = in_array($this->optionRepository->model(), setting('custom_field_models', []));
@@ -90,7 +97,7 @@ class OptionController extends Controller
             $html = generateCustomField($customFields);
         }
         // return view('options.create')->with("customFields", isset($html) ? $html : false);
-        return view('options.create')->with("customFields", isset($html) ? $html : false)->with("product", $product)->with("optionGroup", $optionGroup);
+        return view('options.create')->with("customFields", isset($html) ? $html : false)->with('market',$market)->with("product", $product)->with("optionGroup", $optionGroup);
     }
 
     /**
@@ -163,6 +170,20 @@ class OptionController extends Controller
         // Esta estructura es nueva y es asi para que solo cargue el producto que esta seleccionado previamente
         $product;
         $optionGroup;
+        $market = [];
+        if (isset($option->market_id)) {
+            $marketGEt = $this->marketRepository->findWithoutFail($option->market_id);
+            if ($marketGEt != null) {
+
+                $market = array($marketGEt->id => $marketGEt->name);
+                $option->name_market = $marketGEt->name;
+            } else {
+                $market = [];
+            }
+        } else {
+            $market = [];
+        }
+       
         if (isset($option->product_id)) {
             $productGette = $this->productRepository->findWithoutFail($option->product_id);
             if ($productGette != null) {
@@ -193,7 +214,7 @@ class OptionController extends Controller
             $html = generateCustomField($customFields, $customFieldsValues);
         }
 
-        return view('options.edit')->with('option', $option)->with("customFields", isset($html) ? $html : false)->with("product", $product)->with("optionGroup", $optionGroup);
+        return view('options.edit')->with('option', $option)->with("customFields", isset($html) ? $html : false)->with('market',$market)->with("product", $product)->with("optionGroup", $optionGroup);
     }
 
     /**
@@ -351,7 +372,6 @@ class OptionController extends Controller
 
     public function searchOptionGroupsFromMarket(Request $request)
     {
-        // $OptionGroups = DB::table('option_groups')->where('market_id','=',$request->input('idMarket', ''))->where('name_admin', 'LIKE', '%' . $request->input('optiongroup', '') . '%')
         $OptionGroups = DB::table('option_groups')->where('market_id', '=', $request->input('idMarket', ''))->where('name', 'LIKE', '%' . $request->input('optiongroup', '') . '%')
             ->get(['id', 'name as text', 'name_admin']);
         $OptionGroupsNew = [];
@@ -433,7 +453,7 @@ class OptionController extends Controller
                 // $product->sort_id = $sortOrder;
                 // $product->save();
 
-                DB::table('options')->where('id','=',$id)->update([
+                DB::table('options')->where('id', '=', $id)->update([
                     "sort_id" => $sortOrder,
                 ]);
 
@@ -478,14 +498,14 @@ class OptionController extends Controller
         if (empty($option)) {
             Flash::error('Option not found');
             // return redirect(route('options.index'));
-        }else{
+        } else {
             $input = $request->all();
             $option_group_id = $input['option_group_id'];
-    
+
             $OptionGroups = DB::table('options_by_options_groups')->where('option_group_id', '=', $option_group_id)->where('option_id', '=', $id)->update([
                 'active' => $input['active'],
             ]);
-    
+
             try {
                 $option_group = $this->optionGroupRepository->findWithoutFail($option_group_id);
                 if (!empty($option_group)) {
@@ -497,13 +517,11 @@ class OptionController extends Controller
                 }
                 $input['active'] = '1';
                 $option = $this->optionRepository->update($input, $id);
-    
+
             } catch (ValidatorException $e) {
                 Flash::error($e->getMessage());
             }
         }
-
-
 
     }
 
@@ -522,32 +540,16 @@ class OptionController extends Controller
 
         if (empty($option)) {
 
-
         }
         $this->optionRepository->delete($input['id']);
     }
     public function searchOptions(Request $request)
     {
 
-        $categories = DB::table('options')->where('market_id', '=', $request->input('market_id', ''))->where('name', 'LIKE', '%' . $request->input('option', '') . '%')->get(['id', 'name as text']);
-
-        $categoriesNew = [];
-        $arrayNuevo = [];
-
-        foreach ($categories as $model) {
-
-            if (!empty($model->market)) {
-                $products[$model->market->name][$model->id] = $model->name;
-            }
-            $arrayNuevo[] = array(
-                'id' => $model->id,
-                'text' => $model->text,
-            );
-
-        }
-
-        $categoriesNew = $arrayNuevo;
-        return ['results' => $categoriesNew];
+        $categories = DB::table('options')->where('market_id', '=', $request->input('market_id', ''))
+            ->where('name', 'LIKE', '%' . $request->input('option', '') . '%')
+            ->get(['id', 'name as text']);
+        return ['results' => $categories];
     }
 
     public function addOptionsFromMarket(Request $request)
@@ -576,12 +578,11 @@ class OptionController extends Controller
         $id = $request['id'];
         $idG = $request['idG'];
         $idP = $request['idP'];
-        
+
         DB::table('options_by_options_groups')->where('option_id', '=', $id)->where('option_group_id', '=', $idG)->delete();
         DB::table('options')->where('id', '=', $id)->update([
             "product_id" => $idP,
         ]);
-
 
     }
 

@@ -475,7 +475,7 @@ class DepartmentController extends Controller
             if (isset($input['image']) && $input['image']) {
                 $cacheUpload = $this->uploadRepository->getByUuid($input['image']);
                 $mediaItem = $cacheUpload->getMedia('image')->first();
-                $mediaItem->copy($product, 'image');
+                $mediaItem->copy($department, 'image');
             }
         } catch (ValidatorException $e) {
             Flash::error($e->getMessage());

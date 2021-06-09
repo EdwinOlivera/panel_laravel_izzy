@@ -40,9 +40,6 @@ class FieldDataTable extends DataTable
             ->editColumn('updated_at', function ($field) {
                 return getDateColumn($field, 'updated_at');
             })
-            // ->editColumn('markets', function ($field) {
-            //     return getLinksColumnByRouteName($field->markets, 'markets.edit', 'id', 'name');
-            // })
             ->addColumn('action', 'fields.datatables_actions')
             ->rawColumns(array_merge($columns, ['action']));
 
@@ -67,16 +64,16 @@ class FieldDataTable extends DataTable
                 'title' => trans('Mensaje'),
             ],
             [
+                'data' => 'index_relevance',
+                'title' => trans('Índice'),
+            ],
+
+            [
                 'data' => 'image',
                 'title' => trans('lang.field_image'),
                 'searchable' => false, 'orderable' => false, 'exportable' => false, 'printable' => false,
             ],
-            // (auth()->check() && auth()->user()->hasAnyRole(['admin', 'manager'])) ? [
-            //     'data' => 'markets',
-            //     'title' => trans('lang.field_markets'),
-            //     'searchable' => false,
-
-            // ] : null,
+           
             [
                 'data' => 'updated_at',
                 'title' => trans('lang.field_updated_at'),
@@ -108,7 +105,7 @@ class FieldDataTable extends DataTable
      */
     public function query(Field $model)
     {
-        return $model->newQuery();
+        return $model->newQuery()->orderBy('index_relevance');
     }
 
     /**

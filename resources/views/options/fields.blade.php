@@ -13,7 +13,7 @@
   </div>
 </div>
 <!-- 'Boolean Active Field' -->
-<div class="form-group row ">
+{{-- <div class="form-group row ">
   {!! Form::label('active', trans("Activo"),['class' => 'col-3 control-label text-right']) !!}
   <div class="checkbox icheck">
       <label class="col-9 ml-2 form-check-inline">
@@ -24,10 +24,33 @@
   <div class="text-muted">
     {{ trans("Activar/Desactivar opción") }}
   </div>
+</div> --}}
+
+@if (isset($option->name_market))
+
+<div class="form-group row ">
+    {!! Form::label('market_id', trans('Esteblecimiento asociado'), ['class' => 'col-3 control-label text-right']) !!}
+    <div class="col-9">
+        <p>{!! $option->name_market !!}</p>
+        <div class="form-text text-muted">
+            {{ trans('Establecimiento donde se usara está opción. Soló los grupos de opciones asociados a este establecimiento podran usar esta Opción') }}
+        </div>
+    </div>
 </div>
+@else
+<div class="form-group row ">
+    {!! Form::label('market_id', trans('Esteblecimiento asociado'), ['class' => 'col-3 control-label text-right']) !!}
+    <div class="col-9">
+        {!! Form::select('market_id', $market, null, ['class' => 'select2 form-control', 'id' => 'markets_select2']) !!}
+        <div class="form-text text-muted">
+            {{ trans('Establecimiento donde se usara está opción. Soló los grupos de opciones asociados a este establecimiento podran usar esta Opción') }}
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Image Field -->
-<div class="form-group row">
+{{-- <div class="form-group row">
   {!! Form::label('image', trans("lang.option_image"), ['class' => 'col-3 control-label text-right']) !!}
   <div class="col-9">
     <div style="width: 100%" class="dropzone image" id="image" data-field="image">
@@ -38,55 +61,56 @@
       {{ trans("lang.option_image_help") }}
     </div>
   </div>
-</div>
+</div> --}}
 @prepend('scripts')
 <script type="text/javascript">
-    var var1586170590554938530ble = '';
-    @if(isset($option) && $option->hasMedia('image'))
-    var1586170590554938530ble = {
-        name: "{!! $option->getFirstMedia('image')->name !!}",
-        size: "{!! $option->getFirstMedia('image')->size !!}",
-        type: "{!! $option->getFirstMedia('image')->mime_type !!}",
-        collection_name: "{!! $option->getFirstMedia('image')->collection_name !!}"};
-    @endif
-    var dz_var1586170590554938530ble = $(".dropzone.image").dropzone({
-        url: "{!!url('uploads/store')!!}",
-        addRemoveLinks: true,
-        maxFiles: 1,
-        init: function () {
-        @if(isset($option) && $option->hasMedia('image'))
-            dzInit(this,var1586170590554938530ble,'{!! url($option->getFirstMediaUrl('image','thumb')) !!}')
-        @endif
-        },
-        accept: function(file, done) {
-            dzAccept(file,done,this.element,"{!!config('medialibrary.icons_folder')!!}");
-        },
-        sending: function (file, xhr, formData) {
-            dzSending(this,file,formData,'{!! csrf_token() !!}');
-        },
-        maxfilesexceeded: function (file) {
-            dz_var1586170590554938530ble[0].mockFile = '';
-            dzMaxfile(this,file);
-        },
-        complete: function (file) {
-            dzComplete(this, file, var1586170590554938530ble, dz_var1586170590554938530ble[0].mockFile);
-            dz_var1586170590554938530ble[0].mockFile = file;
-        },
-        removedfile: function (file) {
-            dzRemoveFile(
-                file, var1586170590554938530ble, '{!! url("options/remove-media") !!}',
-                'image', '{!! isset($option) ? $option->id : 0 !!}', '{!! url("uplaods/clear") !!}', '{!! csrf_token() !!}'
-            );
-        }
-    });
-    dz_var1586170590554938530ble[0].mockFile = var1586170590554938530ble;
-    dropzoneFields['image'] = dz_var1586170590554938530ble;
+    // var var1586170590554938530ble = '';
+    // @if(isset($option) && $option->hasMedia('image'))
+    // var1586170590554938530ble = {
+    //     name: "{!! $option->getFirstMedia('image')->name !!}",
+    //     size: "{!! $option->getFirstMedia('image')->size !!}",
+    //     type: "{!! $option->getFirstMedia('image')->mime_type !!}",
+    //     collection_name: "{!! $option->getFirstMedia('image')->collection_name !!}"};
+    // @endif
+    // var dz_var1586170590554938530ble = $(".dropzone.image").dropzone({
+    //     url: "{!!url('uploads/store')!!}",
+    //     addRemoveLinks: true,
+    //     maxFiles: 1,
+    //     init: function () {
+    //     @if(isset($option) && $option->hasMedia('image'))
+    //         dzInit(this,var1586170590554938530ble,'{!! url($option->getFirstMediaUrl('image','thumb')) !!}')
+    //     @endif
+    //     },
+    //     accept: function(file, done) {
+    //         dzAccept(file,done,this.element,"{!!config('medialibrary.icons_folder')!!}");
+    //     },
+    //     sending: function (file, xhr, formData) {
+    //         dzSending(this,file,formData,'{!! csrf_token() !!}');
+    //     },
+    //     maxfilesexceeded: function (file) {
+    //         dz_var1586170590554938530ble[0].mockFile = '';
+    //         dzMaxfile(this,file);
+    //     },
+    //     complete: function (file) {
+    //         dzComplete(this, file, var1586170590554938530ble, dz_var1586170590554938530ble[0].mockFile);
+    //         dz_var1586170590554938530ble[0].mockFile = file;
+    //     },
+    //     removedfile: function (file) {
+    //         dzRemoveFile(
+    //             file, var1586170590554938530ble, '{!! url("options/remove-media") !!}',
+    //             'image', '{!! isset($option) ? $option->id : 0 !!}', '{!! url("uplaods/clear") !!}', '{!! csrf_token() !!}'
+    //         );
+    //     }
+    // });
+    // dz_var1586170590554938530ble[0].mockFile = var1586170590554938530ble;
+    // dropzoneFields['image'] = dz_var1586170590554938530ble;
 
     
 
     $(document).ready(function(){
       searchProducts();
       searchOptionGroup();
+      searchMarkets();
     });
     function searchProducts() {
       $('#products_select2').select2({
@@ -129,6 +153,36 @@
               },
            });
     }
+
+    function searchMarkets() {
+            $('#markets_select2').select2({
+                minimumInputLength: 2,
+                language: {
+
+                    noResults: function() {
+
+                        return "No hay resultado.";
+                    },
+                    searching: function() {
+
+                        return "Buscando..";
+                    },
+
+                    inputTooShort: function() {
+                        return "Escribe al menos 2 letras para buscar";
+                    },
+                },
+                ajax: {
+                    url: '{!! url('search/markets') !!}',
+                    dataType: 'json',
+                    data: function(params) {
+                        return {
+                            market: params.term
+                        };
+                    },
+                },
+            });
+        }
 </script>
 @endprepend
 
@@ -165,15 +219,13 @@
 </div> --}}
 
 <!-- Product Id Field -->
-<div class="form-group row ">
+{{-- <div class="form-group row ">
   {!! Form::label('product_id', trans("lang.option_product_id"),['class' => 'col-3 control-label text-right']) !!}
   <div class="col-9">
-    {{-- {!! Form::select( ['class' => 'select2 form-control', 'id'=>'products_select2']) !!} --}}
-    {{-- <select name="products_select2_id" id="products_select2" class="form-control select2"></select> --}}
     {!! Form::select('product_id', $product , null, ['class' => 'select2 form-control', 'id'=>'products_select2']) !!}
     <div class="form-text text-muted">{{ trans("lang.option_product_id_help") }}</div>
   </div>
-</div>
+</div> --}}
 
 
 {{-- <!-- {{$optionGroup}} --> --}}
@@ -187,16 +239,13 @@
 </div> --}}
 
 
-<div class="form-group row ">
+{{-- <div class="form-group row ">
   {!! Form::label('option_group_id', trans("lang.option_option_group_id"),['class' => 'col-3 control-label text-right']) !!}
   <div class="col-9">
-    {{-- {!! Form::select( ['class' => 'select2 form-control', 'id'=>'products_select2']) !!} --}}
-    {{-- <select name="products_select2_id" id="products_select2" class="form-control select2"></select> --}}
     {!! Form::select('option_group_id',$optionGroup, null, ['class' => 'select2 form-control', 'id'=>'option_group_select2']) !!}
-
     <div class="form-text text-muted">{{ trans("lang.option_option_group_id_help") }}</div>
   </div>
-</div>
+</div> --}}
 
 
 </div>

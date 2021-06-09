@@ -71,9 +71,10 @@ class Option extends Model implements HasMedia
      */
     public static $rules = [
         'name' => 'required',
+        'market_id' => 'required',
         'price' => 'nullable|numeric|min:0',
-        'product_id' => 'required|exists:products,id',
-        'option_group_id' => 'required|exists:option_groups,id'
+        // 'product_id' => 'required|exists:products,id',
+        // 'option_group_id' => 'required|exists:option_groups,id'
     ];
 
     /**

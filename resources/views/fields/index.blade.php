@@ -35,6 +35,12 @@
           <a class="nav-link" href="{!! route('fields.create') !!}"><i class="fa fa-plus mr-2"></i>{{trans('lang.field_create')}}</a>
         </li>
         @endcan
+
+        @can('fields.create')
+        <li class="nav-item">
+          <a class="nav-link" href="{!! route('edit_order_fields') !!}"><i class="fa fa-th mr-2"></i>{{trans('Editar orden')}}</a>
+        </li>
+        @endcan
         @include('layouts.right_toolbar', compact('dataTable'))
       </ul>
     </div>

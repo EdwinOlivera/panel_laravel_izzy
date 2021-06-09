@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File name: FACController.php
  * Last modified: 2020.09.12
@@ -9,16 +10,14 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class FACController extends ParentOrderController
 {
 
     public function __init()
-    {
-
-    }
+    { }
 
     public function Sign($passwd, $facId, $acquirerId, $orderNumber, $amount, $currency)
     {
@@ -32,9 +31,9 @@ class FACController extends ParentOrderController
     public function conversionDeDatos(Request $request)
     {
 
-        $response;
+        $response = [];
 
-        $orderNumber = "izzydelivery" . substr(md5(uniqid()), 0, 12);
+        $orderNumber = "facAPP" . substr(md5(uniqid()), 0, 12);
 
         $response['orderNumber'] = $orderNumber;
         // fac_merchant_password
@@ -71,10 +70,9 @@ class FACController extends ParentOrderController
         $response['url_transaction_modification'] = $TransactionModification->value;
         $response['urlFAC3DS'] = $base_url_fac_3d_secure->value;
         $response['signature'] = $signature;
-        $response['empresa'] = 'IZZY';
+        $response['empresa'] = 'LION_DELIVERY';
         $response['Hora'] = [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()];
 
         return $response;
-
     }
 }

@@ -170,7 +170,7 @@
                 </div>
 
                 <h5 class="col-12 pb-4 custom-field-container " style="color: red"><i class="mr-3 fa fa-key" style="color: red"></i>{!!
-                    trans('App fuera de servicio temporalmente (No afecta a: Izzy-Store e Izzy - Driver)') !!}</h5>
+                    trans('App fuera de servicio temporalmente (No afecta a: Markets y a Drivers)') !!}</h5>
 
                 <!-- message_app_off_line Field -->
                 <div class="form-group row col-12">

@@ -6,9 +6,9 @@
   @endcan
 
   @can('optionGroups.edit')
-  <!-- <a data-toggle="tooltip" data-placement="bottom" title="{{trans('lang.option_group_edit')}}" href="{{ route('optionGroups.edit', $id) }}" class='btn btn-link'>
+  <a data-toggle="tooltip" data-placement="bottom" title="{{trans('lang.option_group_edit')}}" href="{{ route('optionGroups.edit', $id) }}" class='btn btn-link'>
     <i class="fa fa-edit"></i>
-  </a> -->
+  </a>
   @endcan
 
   @can('optionGroups.destroy')

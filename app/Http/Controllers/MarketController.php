@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File name: MarketController.php
  * Last modified: 2020.04.30 at 08:21:08
@@ -68,11 +69,16 @@ class MarketController extends Controller
      */
     private $TypeMarketRepository;
 
-    public function __construct(MarketRepository $marketRepo, CategoryRepository $categoryRepo, ProductRepository $productRepo,
+    public function __construct(
+        MarketRepository $marketRepo,
+        CategoryRepository $categoryRepo,
+        ProductRepository $productRepo,
         CustomFieldRepository $customFieldRepo,
         UploadRepository $uploadRepo,
         UserRepository $userRepo,
-        FieldRepository $fieldRepository, TypeMarketRepository $typeMarketRepo) {
+        FieldRepository $fieldRepository,
+        TypeMarketRepository $typeMarketRepo
+    ) {
         parent::__construct();
         $this->marketRepository = $marketRepo;
         $this->productRepository = $productRepo;
@@ -200,12 +206,13 @@ class MarketController extends Controller
             Flash::error(__('lang.not_found', ['operator' => __('lang.market')]));
             return redirect(route('markets.index'));
         }
-        // if ($market['active'] == 0) {
-        //     $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
-        // } else {
-        // }
+
+        //? if ($market['active'] == 0) {
+        //?     $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
+        //? } else {
+        //? }
         $user = $this->userRepository->getByCriteria(new ManagersCriteria())->pluck('name', 'id');
-        
+
         $drivers = $this->userRepository->getByCriteria(new DriversCriteria())->pluck('name', 'id');
         $field = $this->fieldRepository->pluck('name', 'id');
 
@@ -213,12 +220,9 @@ class MarketController extends Controller
         $driversSelected = $market->drivers()->pluck('users.id')->toArray();
         $fieldsSelected = $market->fields()->pluck('fields.id')->toArray();
 
-        $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->marketRepository->model());
-
-        
         $typeMarket = $this->TypeMarketRepository->pluck('name', 'id');
 
-        return view('markets.edit')->with('market', $market)->with("typeMarket", $typeMarket)->with("customFields", isset($html) ? $html : false)->with("user", $user)->with("drivers", $drivers)->with("usersSelected", $usersSelected)->with("driversSelected", $driversSelected)->with('field', $field)->with('fieldsSelected', $fieldsSelected);
+        return view('markets.edit')->with('market', $market)->with("typeMarket", $typeMarket)->with("user", $user)->with("drivers", $drivers)->with("usersSelected", $usersSelected)->with("driversSelected", $driversSelected)->with('field', $field)->with('fieldsSelected', $fieldsSelected);
     }
 
     /**
@@ -242,7 +246,7 @@ class MarketController extends Controller
         //     $user = $this->userRepository->getByCriteria(new ManagersClientsCriteria())->pluck('name', 'id');
         // } else {
         // }
-        
+
         $user = $this->userRepository->getByCriteria(new ManagersCriteria())->pluck('name', 'id');
         // $products = $this->productRepository->where('market_id', $market->id)->orderBy('sort_id', 'asc')->get(['id', 'category_id']);
         $categoryProductsIDRaw = DB::table('categoriesproducts')->where('market_id', $market->id)->pluck('active', 'category_id');
@@ -277,7 +281,7 @@ class MarketController extends Controller
     {
         $this->marketRepository->pushCriteria(new MarketsOfUserCriteria(auth()->id()));
         $oldMarket = $this->marketRepository->findWithoutFail($id);
-
+        $request['delivery_range'] = 100;
         if (empty($oldMarket)) {
             Flash::error('Market not found');
             return redirect(route('markets.index'));
@@ -365,7 +369,6 @@ class MarketController extends Controller
                 DB::table('products')->where('id', '=', $id)->update([
                     "sort_id" => $sortOrder,
                 ]);
-
             }
             return ['success' => true, 'message' => 'Updated'];
         }
@@ -385,7 +388,6 @@ class MarketController extends Controller
         DB::table('products')->whereIn('id', (array) $idsProducts)->update([
             "promotion" => '1',
         ]);
-
     }
 
     public function getPromos(Request $request)
@@ -415,10 +417,16 @@ class MarketController extends Controller
                 DB::table('products')->where('id', '=', $id)->update([
                     "sort_promo_id" => $sortOrder,
                 ]);
-
             }
             return ['success' => true, 'message' => 'Updated'];
         }
     }
 
+
+    public function searchMarkets(Request $request)
+    {
+        $Markets = DB::table('markets')->where('name', 'LIKE', '%' . $request->input('market', '') . '%')
+            ->get(['id', 'name as text']);
+        return ['results' => $Markets];
+    }
 }

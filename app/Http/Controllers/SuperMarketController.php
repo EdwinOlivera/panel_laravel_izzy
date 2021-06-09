@@ -295,6 +295,7 @@ class SupermarketController extends Controller
     {
         $this->marketRepository->pushCriteria(new MarketsOfUserCriteria(auth()->id()));
         $oldMarket = $this->marketRepository->findWithoutFail($id);
+        $request['delivery_range'] = 100;
 
         if (empty($oldMarket)) {
             Flash::error('Market not found');

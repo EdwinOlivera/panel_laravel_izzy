@@ -11,6 +11,7 @@ use App\Repositories\MarketRepository;
 use App\Repositories\UploadRepository;
 use Flash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Prettus\Validator\Exceptions\ValidatorException;
@@ -225,5 +226,49 @@ class FieldController extends Controller
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
+    }
+
+    public function modificarOrden()
+    {
+
+        $fields = $this->fieldRepository->orderBy('index_relevance')->get();
+
+        return view('fields.edit_order')->with('fields', $fields);
+
+    }
+
+    public function sortOrden(Request $request)
+    {
+        if ($request->has('ids')) {
+            $arr = explode(',', $request->input('ids'));
+
+            foreach ($arr as $sortOrder => $id) {
+                DB::table('fields')->where('id', '=', $id)->update([
+                    "index_relevance" => $sortOrder,
+                ]);
+
+            }
+
+            return ['success' => true, 'message' => 'Updated'];
+        }
+    }
+
+
+    public function updateFields(Request $request)
+    {
+        $field = $this->fieldRepository->findWithoutFail($request['idF']);
+
+        if (!empty($field)) {
+            $input = $request->all();
+            DB::table('fields')->where('id', '=', $input['idF'])->update([
+                "name" => $input['name'],
+                "active" => $input['activeFiel'],
+                "description" => $input['description'],
+            ]);            
+        }
+
+        
+
+
     }
 }

@@ -52,6 +52,7 @@ class OptionGroup extends Model
         'name' => 'required',
         'name_admin' => 'required',
         'cant_selectable' => 'required',
+        'market_id' => 'required',
 
     ];
 

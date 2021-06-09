@@ -194,15 +194,15 @@ return [
 
     'app_setting_firebase_storage_bucket_placeholder' => 'muti-restauts-15430c.appspot.com',
 
-    'app_setting_fixed_footer' => 'Fixed Footer',
+    'app_setting_fixed_footer' => 'Anclar pie de pagína',
 
-    'app_setting_fixed_footer_help' => 'Fix Footer on bottom',
+    'app_setting_fixed_footer_help' => 'Anclar pie de pagína',
 
-    'app_setting_fixed_header' => 'Fixed Header',
+    'app_setting_fixed_header' => 'Anclar encabezado',
 
-    'app_setting_fixed_header_help' => 'Fix Header on top',
+    'app_setting_fixed_header_help' => 'Anclar encabezado.',
 
-    'app_setting_fr' => 'French',
+    'app_setting_fr' => 'Frances',
 
     'app_setting_global' => 'Opciones',
 

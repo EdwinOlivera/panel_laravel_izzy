@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File name: ProductController.php
  * Last modified: 2020.04.30 at 08:21:08
@@ -61,14 +62,16 @@ class ProductController extends Controller
     /** @var  OptionGroupRepository */
     private $optionGroupRepository;
 
-    public function __construct(ProductRepository $productRepo
-        , CustomFieldRepository $customFieldRepo
-        , UploadRepository $uploadRepo
-        , MarketRepository $marketRepo
-        , SectionRepository $sectionRepo
-        , CategoryRepository $categoryRepo
-        , SubdepartmentRepository $subdepartmentRepo
-        , OptionGroupRepository $optionGroupRepo) {
+    public function __construct(
+        ProductRepository $productRepo,
+        CustomFieldRepository $customFieldRepo,
+        UploadRepository $uploadRepo,
+        MarketRepository $marketRepo,
+        SectionRepository $sectionRepo,
+        CategoryRepository $categoryRepo,
+        SubdepartmentRepository $subdepartmentRepo,
+        OptionGroupRepository $optionGroupRepo
+    ) {
         parent::__construct();
         $this->sectionRepository = $sectionRepo;
         $this->productRepository = $productRepo;
@@ -115,7 +118,8 @@ class ProductController extends Controller
             $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->productRepository->model());
             $html = generateCustomField($customFields);
         }
-        return view('products.create')->with("customFields", isset($html) ? $html : false)->with("market", $market)->with("category", $category)->with("categoriesSelected", $categoriesSelected)->with('isNormal', $isNormal)->with('subparments', $subparments);
+        $disponible = 1;
+        return view('products.create')->with("customFields", isset($html) ? $html : false)->with("disponible", $disponible)->with("market", $market)->with("category", $category)->with("categoriesSelected", $categoriesSelected)->with('isNormal', $isNormal)->with('subparments', $subparments);
     }
 
     /**
@@ -136,7 +140,6 @@ class ProductController extends Controller
         $input['featured'] = '1';
         if (isset($input['categories']) && ($input['categories'])) {
             $input['category_id'] = $input['categories'][0];
-
         }
         $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->productRepository->model());
         try {
@@ -216,7 +219,6 @@ class ProductController extends Controller
         if ($marketTemp[0]['type_market_id'] == '3') {
             $isNormal = false;
             $subparments = $this->subdepartmentRepository->where('market_id', $marketTemp[0]['id'])->pluck('name', 'id');
-
         }
         return view('products.edit')->with('product', $product)->with("customFields", isset($html) ? $html : false)->with("market", $market)->with("categoriesSelected", $categoriesSelected)->with("category", $category)->with('isNormal', $isNormal)->with('subparments', $subparments);
     }
@@ -284,7 +286,6 @@ class ProductController extends Controller
             $this->productRepository->delete($id);
 
             Flash::success(__('lang.deleted_successfully', ['operator' => __('lang.product')]));
-
         } else {
             Flash::warning('Esta app solo es una demo, no puede modifcar esta sección ');
         }
@@ -307,13 +308,11 @@ class ProductController extends Controller
 
         if (empty($product)) {
             Flash::error('Producto no encontrado.');
-
         }
 
         $this->productRepository->delete($input['id']);
 
         Flash::success(__('lang.deleted_successfully', ['operator' => __('lang.product')]));
-
     }
     /**
      * Remove the specified Product from storage without get out this page.
@@ -329,14 +328,12 @@ class ProductController extends Controller
 
         if (empty($product)) {
             Flash::error('Producto no encontrado.');
-
         }
         DB::table('product_categories')->where('product_id', '=', $input['id'])->where('category_id', '=', $input['idC'])->delete();
         // DB::table('products')->where('id', '=', $input['id'])->update([
         //     "category_id" => '0',
         // ]);
         Flash::success(__('lang.deleted_successfully', ['operator' => __('lang.product')]));
-
     }
 
     /**
@@ -353,14 +350,12 @@ class ProductController extends Controller
 
         if (empty($product)) {
             Flash::error('Producto no encontrado.');
-
         }
         DB::table('subdepartments_products')->where('product_id', '=', $input['id'])->where('subdepartment_id', '=', $input['idS'])->delete();
         // DB::table('products')->where('id', '=', $input['id'])->update([
         //     "category_id" => '0',
         // ]);
         Flash::success(__('lang.deleted_successfully', ['operator' => __('lang.product')]));
-
     }
 
     /**
@@ -377,14 +372,12 @@ class ProductController extends Controller
 
         if (empty($product)) {
             Flash::error('Producto no encontrado.');
-
         }
         DB::table('section_product')->where('product_id', '=', $input['id'])->where('section_id', '=', $input['idSection'])->where('market_id', '=', $input['idMarket'])->delete();
         // DB::table('products')->where('id', '=', $input['id'])->update([
         //     "category_id" => '0',
         // ]);
         Flash::success(__('lang.deleted_successfully', ['operator' => __('lang.product')]));
-
     }
     /**
      * Remove the specified Product from storage without get out this page.
@@ -471,7 +464,6 @@ class ProductController extends Controller
             $input = $request->all();
             try {
                 $product = $this->productRepository->update($input, $id);
-
             } catch (ValidatorException $e) {
                 Flash::error($e->getMessage());
             }
@@ -499,7 +491,6 @@ class ProductController extends Controller
         }
 
         $optionGroupProduct = $this->optionGroupRepository->where('id_producto', $id);
-
     }
 
     /**
@@ -529,7 +520,6 @@ class ProductController extends Controller
 
                     if (in_array($product_id, $idProdutsMarket)) {
                         $idProductsMarketsFilter[] = $product_id;
-
                     }
                 }
             }
@@ -603,7 +593,7 @@ class ProductController extends Controller
         $section = $this->sectionRepository->findWithoutFail($idSection);
         if (!empty($section)) {
             $products = $section->products()->get();
-            
+
             $idsProducts = [];
             foreach ($products as $product) {
                 $idsProducts[] = $product->id;
@@ -635,7 +625,7 @@ class ProductController extends Controller
             $market = array($marketTemp->id => $marketTemp->name);
         } else {
             $marketTemp = $this->marketRepository->findWithoutFail($idMarket);
-        
+
             $market = array($marketTemp->id => $marketTemp->name);
             // $market = $this->marketRepository->myActiveMarkets()->pluck('name', 'id');
         }
@@ -646,7 +636,7 @@ class ProductController extends Controller
         if ($marketTemp->type_market_id == '3') {
             $isNormal = false;
             $idsSubDepartment = DB::table('subdepartments_departments')->where('market_id', $marketTemp->id)->pluck('subdepartment_id');
-            $subparments = DB::table('subdepartments')->pluck('name','id');
+            $subparments = DB::table('subdepartments')->pluck('name', 'id');
         }
 
         $hasCustomField = in_array($this->productRepository->model(), setting('custom_field_models', []));
@@ -654,8 +644,8 @@ class ProductController extends Controller
             $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->productRepository->model());
             $html = generateCustomField($customFields);
         }
-
-        return view('products.createMarket')->with("customFields", isset($html) ? $html : false)->with('idMarket', $idMarket)->with("market", $market)->with("category", $category)->with("categoriesSelected", $categoriesSelected)->with('isNormal', $isNormal)->with('subparments', $subparments);
+        $disponible = 1;
+        return view('products.createMarket')->with("customFields", isset($html) ? $html : false)->with('disponible', $disponible)->with('idMarket', $idMarket)->with("market", $market)->with("category", $category)->with("categoriesSelected", $categoriesSelected)->with('isNormal', $isNormal)->with('subparments', $subparments);
     }
 
     /**
@@ -675,7 +665,6 @@ class ProductController extends Controller
         try {
             if (isset($input['categories']) && ($input['categories'])) {
                 $input['category_id'] = $input['categories'][0];
-
             }
             $product = $this->productRepository->create($input);
 
@@ -734,7 +723,7 @@ class ProductController extends Controller
         if ($marketTemp->type_market_id == '3') {
             $isNormal = false;
             $idsSubDepartment = DB::table('subdepartments_departments')->where('market_id', $marketTemp->id)->pluck('subdepartment_id');
-            $subparments = DB::table('subdepartments')->pluck('name','id');
+            $subparments = DB::table('subdepartments')->pluck('name', 'id');
         }
         $customFieldsValues = $product->customFieldsValues()->with('customField')->get();
         $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->productRepository->model());
@@ -813,7 +802,7 @@ class ProductController extends Controller
         if ($marketTemp->type_market_id == '3') {
             $isNormal = false;
             $idsSubDepartment = DB::table('subdepartments_departments')->where('market_id', $marketTemp->id)->pluck('subdepartment_id');
-            $subparments = DB::table('subdepartments')->pluck('name','id');
+            $subparments = DB::table('subdepartments')->pluck('name', 'id');
         }
 
         $hasCustomField = in_array($this->productRepository->model(), setting('custom_field_models', []));
@@ -821,8 +810,8 @@ class ProductController extends Controller
             $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->productRepository->model());
             $html = generateCustomField($customFields);
         }
-
-        return view('products.createSupermarket')->with("customFields", isset($html) ? $html : false)->with('idMarket', $idMarket)->with("market", $market)->with("category", $category)->with("categoriesSelected", $categoriesSelected)->with('isNormal', $isNormal)->with('subparmentsSelected', $subparmentsSelected)->with('subparments', $subparments);
+        $disponible = 1;
+        return view('products.createSupermarket')->with("customFields", isset($html) ? $html : false)->with('disponible', $disponible)->with('idMarket', $idMarket)->with("market", $market)->with("category", $category)->with("categoriesSelected", $categoriesSelected)->with('isNormal', $isNormal)->with('subparmentsSelected', $subparmentsSelected)->with('subparments', $subparments);
     }
 
     /**
@@ -851,7 +840,6 @@ class ProductController extends Controller
         if ($marketTemp->type_market_id == '2') {
             $isNormal = false;
             $sections = $marketTemp->sections()->orderBy('sort_id', 'asc')->pluck('name', 'id');
-
         }
 
         $hasCustomField = in_array($this->productRepository->model(), setting('custom_field_models', []));
@@ -859,16 +847,16 @@ class ProductController extends Controller
             $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->productRepository->model());
             $html = generateCustomField($customFields);
         }
-
-        return view('products.createConvenienceStores')->with("customFields", isset($html) ? $html : false)->with('idMarket', $idMarket)->with("market", $market)->with("category", $category)->with("categoriesSelected", $categoriesSelected)->with('isNormal', $isNormal)->with('sectionsSelected', $sectionsSelected)->with('sections', $sections);
+        $disponible = 1;
+        return view('products.createConvenienceStores')->with("customFields", isset($html) ? $html : false)->with('disponible', $disponible)->with('idMarket', $idMarket)->with("market", $market)->with("category", $category)->with("categoriesSelected", $categoriesSelected)->with('isNormal', $isNormal)->with('sectionsSelected', $sectionsSelected)->with('sections', $sections);
     }
-/**
- * Store a newly created Product in storage.
- *
- * @param CreateProductRequest $request
- *
- * @return Response
- */
+    /**
+     * Store a newly created Product in storage.
+     *
+     * @param CreateProductRequest $request
+     *
+     * @return Response
+     */
 
     public function storeFromConvenienceStore(CreateProductRequest $request)
     {
@@ -889,7 +877,7 @@ class ProductController extends Controller
                     "market_id" => $market->id,
                 ]);
             }
-        
+
             $product->customFieldsValues()->createMany(getCustomFieldsValues($customFields, $request));
             if (isset($input['image']) && $input['image']) {
                 $cacheUpload = $this->uploadRepository->getByUuid($input['image']);
@@ -926,7 +914,6 @@ class ProductController extends Controller
         try {
             if (isset($input['categories']) && ($input['categories'])) {
                 $input['category_id'] = $input['categories'][0];
-
             }
             $product = $this->productRepository->create($input);
 
@@ -966,7 +953,6 @@ class ProductController extends Controller
         if (empty($product)) {
             Flash::error(__('lang.not_found', ['operator' => __('lang.product')]));
             return redirect(route('products.index'));
-            
         }
         $idMarket = $product->market_id;
         $categoriesSelected = $product->categories()->pluck('categories.id')->toArray();
@@ -986,7 +972,7 @@ class ProductController extends Controller
         if ($marketTemp->type_market_id == '3') {
             $isNormal = false;
             $idsSubDepartment = DB::table('subdepartments_departments')->where('market_id', $marketTemp->id)->pluck('subdepartment_id');
-            $subparments = DB::table('subdepartments')->pluck('name','id');
+            $subparments = DB::table('subdepartments')->pluck('name', 'id');
         }
         $customFieldsValues = $product->customFieldsValues()->with('customField')->get();
         $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->productRepository->model());
@@ -1032,8 +1018,6 @@ class ProductController extends Controller
         if ($marketTemp->type_market_id == '2') {
             $isNormal = false;
             $sections = $marketTemp->sections()->orderBy('sort_id', 'asc')->pluck('name', 'id');
-
-
         }
         $customFieldsValues = $product->customFieldsValues()->with('customField')->get();
         $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->productRepository->model());
@@ -1128,5 +1112,4 @@ class ProductController extends Controller
 
         return redirect(route('convenience_stores.editSectionsByConvenienceStore', $product->market_id));
     }
-
 }

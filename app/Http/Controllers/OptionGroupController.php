@@ -38,7 +38,8 @@ class OptionGroupController extends Controller
      */
     private $marketRepository;
 
-    public function __construct(OptionGroupRepository $optionGroupRepo, OptionRepository $optionRepo, ProductRepository $productRepo, CustomFieldRepository $customFieldRepo, MarketRepository $marketRepo)
+    public function __construct(OptionGroupRepository $optionGroupRepo, OptionRepository $optionRepo, ProductRepository $productRepo, CustomFieldRepository $customFieldRepo, 
+    MarketRepository $marketRepo)
     {
         parent::__construct();
         $this->marketRepository = $marketRepo;
@@ -68,11 +69,12 @@ class OptionGroupController extends Controller
     {
 
         $hasCustomField = in_array($this->optionGroupRepository->model(), setting('custom_field_models', []));
+        $market = [];
         if ($hasCustomField) {
             $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->optionGroupRepository->model());
             $html = generateCustomField($customFields);
         }
-        return view('option_groups.create')->with("customFields", isset($html) ? $html : false);
+        return view('option_groups.create')->with("customFields", isset($html) ? $html : false)->with('market',$market);
     }
 
     /**
@@ -89,7 +91,6 @@ class OptionGroupController extends Controller
         try {
             $optionGroup = $this->optionGroupRepository->create($input);
             $optionGroup->customFieldsValues()->createMany(getCustomFieldsValues($customFields, $request));
-
         } catch (ValidatorException $e) {
             Flash::error($e->getMessage());
         }
@@ -156,10 +157,19 @@ class OptionGroupController extends Controller
             return redirect(route('optionGroups.index'));
         }
 
-        if (auth()->user()->hasRole('admin')) {
-            $market = $this->marketRepository->pluck('name', 'id');
+       
+        $market = [];
+        if (isset($optionGroup->market_id)) {
+            $marketGet = $this->marketRepository->findWithoutFail($optionGroup->market_id);
+
+            if ($marketGet != null) {
+                $market = array($marketGet->id => $marketGet->name);
+                $optionGroup->name_market = $marketGet->name;
+            } else {
+                $market = [];
+            }
         } else {
-            $market = $this->marketRepository->myMarkets()->pluck('name', 'id');
+            $market = [];
         }
 
         $customFieldsValues = $optionGroup->customFieldsValues()->with('customField')->get();
@@ -328,7 +338,7 @@ class OptionGroupController extends Controller
         $grupos = [];
 
         foreach ($optionsGroupsEncontrados as $grupo) {
-            
+
             if (isset($idsOptionGroup[$grupo->id])) {
                 $grupo->active = $idsOptionGroup[$grupo->id];
                 $grupos[] = $grupo;
@@ -416,14 +426,13 @@ class OptionGroupController extends Controller
             "id_producto" => '0',
         ]);
 
-
     }
 
     public function addOptionsFromMarket(Request $request)
     {
 
         $input = $request->all();
-        
+
         $idGO = $request['idGO'];
         $idMarket = $request['idMarket'];
         $idsOption = DB::table('options_by_options_groups')->where('option_group_id', '=', $idGO)->pluck('option_id')->toArray();
@@ -440,7 +449,7 @@ class OptionGroupController extends Controller
         }
 
         $input['optionsList'] = $idsOption;
-        
+
         return $this->optionGroupRepository->update($input, $idGO);
     }
 

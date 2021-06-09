@@ -46,7 +46,7 @@
                 </div>
 
                 <!-- main_dark_color Field -->
-                <div class="form-group row col-6">
+                {{-- <div class="form-group row col-6">
                     {!! Form::label('main_dark_color', trans("lang.app_setting_main_dark_color"), ['class' => 'col-4 control-label text-right']) !!}
                     <div class="col-8">
                         <div id="main-colorpicker" class="input-group colorpicker-component">
@@ -59,7 +59,7 @@
                             {{ trans("lang.app_setting_main_dark_color_help") }}
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- second_color Field -->
                 <div class="form-group row col-6">
@@ -78,7 +78,7 @@
                 </div>
 
                 <!-- second_dark_color Field -->
-                <div class="form-group row col-6">
+                {{-- <div class="form-group row col-6">
                     {!! Form::label('second_dark_color', trans("lang.app_setting_second_dark_color"), ['class' => 'col-4 control-label text-right']) !!}
                     <div class="col-8">
                         <div id="main-colorpicker" class="input-group colorpicker-component">
@@ -91,7 +91,7 @@
                             {{ trans("lang.app_setting_second_dark_color_help") }}
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
 
                 <!-- accent_color Field -->
@@ -111,7 +111,7 @@
                 </div>
 
                 <!-- accent_dark_color Field -->
-                <div class="form-group row col-6">
+                {{-- <div class="form-group row col-6">
                     {!! Form::label('accent_dark_color', trans("lang.app_setting_accent_dark_color"), ['class' => 'col-4 control-label text-right']) !!}
                     <div class="col-8">
                         <div id="main-colorpicker" class="input-group colorpicker-component">
@@ -124,7 +124,7 @@
                             {{ trans("lang.app_setting_accent_dark_color_help") }}
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
 
                 <!-- scaffold_dark_color Field -->

@@ -104,8 +104,6 @@
                     </div>
                 </div>
                 @endfor
-
-                
             </div> --}}
             <!-- Submit Field -->
             <div class="form-group mt-4 col-12 text-right">

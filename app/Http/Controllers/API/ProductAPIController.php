@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File name: ProductAPIController.php
  * Last modified: 2020.05.04 at 09:04:19
@@ -59,7 +60,6 @@ class ProductAPIController extends Controller
         $this->customFieldRepository = $customFieldRepo;
         $this->uploadRepository = $uploadRepo;
         $this->optionGroupRepository = $optionGroupRepo;
-
     }
 
     /**
@@ -86,15 +86,15 @@ class ProductAPIController extends Controller
             $productsArray = $products->toArray();
             $productsFinal = [];
             $valueActiveProduct = [];
-            foreach ($productsArray as $product) {
-
-                $valueActiveProduct = DB::table('product_categories')->where('product_id', '=', $product['id'])->get('active');
-                if ($valueActiveProduct[0]->active) {
-                    $productsFinal[] = $product;
+            if (!isset($request['no_filter'])) {
+                foreach ($productsArray as $product) {
+                    $valueActiveProduct = DB::table('product_categories')->where('product_id', '=', $product['id'])->get('active');
+                    if ($valueActiveProduct[0]->active) {
+                        $productsFinal[] = $product;
+                    }
                 }
-
+                $productsArray = $productsFinal;
             }
-            $productsArray = $productsFinal;
         } catch (RepositoryException $e) {
             return $this->sendError($e->getMessage());
         }
@@ -137,7 +137,6 @@ class ProductAPIController extends Controller
             $this->productRepository->pushCriteria(new ProductsOfCategoriesCriteria($request));
 
             $products = $this->productRepository->all();
-
         } catch (RepositoryException $e) {
             return $this->sendError($e->getMessage());
         }
@@ -146,53 +145,55 @@ class ProductAPIController extends Controller
         $productsFinal = [];
 
         $productsArray = $products->toArray();
-        if ($promo) {
-            return $this->sendResponse($productsArray, 'Promos enviados');
+        if (!isset($request['no_filter'])) {
+            if ($promo) {
+                return $this->sendResponse($productsArray, 'Promos enviados');
+            } else {
 
-        } else {
-
-            if (count($idsCategories) > 0) {
-                $idMarket = $marketId;
-                $valueActiveCategory = DB::table('categoriesproducts')->where('market_id', '=', $idMarket)->whereIn('category_id', $idsCategories)->pluck('active', 'category_id');
-                $idsProducts = DB::table('products')->where('market_id', '=', $idMarket)->get(['featured', 'id'])->toArray();
-                $algo = [];
-                foreach ($idsProducts as $idP) {
-                    if ($idP->featured) {
-                        $algo[] = $idP->id;
-                    }
-                }
-                $datosProductosRaw = DB::table('product_categories')->whereIn('category_id', $idsCategories)->whereIn('product_id', $algo)->where('active', '1')->get();
-                $idsProducts = [];
-                foreach ($datosProductosRaw as $idPR) {
-                    if ($idPR->active) {
-                        $idsProducts[] = $idPR->product_id;
-                    }
-                }
-                $productsFilter = $this->productRepository->whereIn('id', $idsProducts)->get();
-                $productsFinal = $productsFilter;
-
-            } else if (count($productsArray) != 0) {
-
-                $idMarket = $productsArray[0]['market_id'];
-                $valueActiveCategory = DB::table('categoriesproducts')->where('market_id', '=', $idMarket)->pluck('active', 'category_id');
-                $idsCategory = [];
-                foreach ($valueActiveCategory as $categoryID => $id) {
-                    $idsCategory[] = $categoryID;
-                }
-                $productsTmp = [];
-                foreach ($productsArray as $product) {
-                    $valueActiveProduct = DB::table('product_categories')->whereIn('category_id', $idsCategory)->where('product_id', '=', $product['id'])->pluck('active');
-                    foreach ($valueActiveProduct as $value) {
-                        if ($value) {
-                            $productsTmp[] = $product;
+                if (count($idsCategories) > 0) {
+                    $idMarket = $marketId;
+                    $valueActiveCategory = DB::table('categoriesproducts')->where('market_id', '=', $idMarket)->whereIn('category_id', $idsCategories)->pluck('active', 'category_id');
+                    $idsProducts = DB::table('products')->where('market_id', '=', $idMarket)->get(['featured', 'id'])->toArray();
+                    $algo = [];
+                    foreach ($idsProducts as $idP) {
+                        if ($idP->featured) {
+                            $algo[] = $idP->id;
                         }
                     }
+                    $datosProductosRaw = DB::table('product_categories')->whereIn('category_id', $idsCategories)->whereIn('product_id', $algo)->where('active', '1')->get();
+                    $idsProducts = [];
+                    foreach ($datosProductosRaw as $idPR) {
+                        if ($idPR->active) {
+                            $idsProducts[] = $idPR->product_id;
+                        }
+                    }
+                    $productsFilter = $this->productRepository->whereIn('id', $idsProducts)->get();
+                    $productsFinal = $productsFilter;
+                } else if (count($productsArray) != 0) {
+
+                    $idMarket = $productsArray[0]['market_id'];
+                    $valueActiveCategory = DB::table('categoriesproducts')->where('market_id', '=', $idMarket)->pluck('active', 'category_id');
+                    $idsCategory = [];
+                    foreach ($valueActiveCategory as $categoryID => $id) {
+                        $idsCategory[] = $categoryID;
+                    }
+                    $productsTmp = [];
+                    foreach ($productsArray as $product) {
+                        $valueActiveProduct = DB::table('product_categories')->whereIn('category_id', $idsCategory)->where('product_id', '=', $product['id'])->pluck('active');
+                        foreach ($valueActiveProduct as $value) {
+                            if ($value) {
+                                $productsTmp[] = $product;
+                            }
+                        }
+                    }
+
+                    $productsFinal = $productsTmp;
                 }
-
-                $productsFinal = $productsTmp;
-
             }
+        } else {
+            $productsFinal = $productsArray;
         }
+
         return $this->sendResponse($productsFinal, 'Productos filtrados enviados');
     }
 
@@ -207,9 +208,8 @@ class ProductAPIController extends Controller
     public function show(Request $request, $id)
     {
         /** @var Product $product */
-        $valueActiveProduct = DB::table('product_categories')->where('product_id', '=', $id)->get('active');
 
-        if ($valueActiveProduct[0]->active) {
+        if (isset($request['no_filter'])) {
             if (!empty($this->productRepository)) {
                 try {
                     $this->productRepository->pushCriteria(new RequestCriteria($request));
@@ -217,8 +217,7 @@ class ProductAPIController extends Controller
                 } catch (RepositoryException $e) {
                     return $this->sendError($e->getMessage());
                 }
-                // Desde aqui se puede conseguir las opciones y grupos de opciones
-                // "option_groups"
+
                 $product = $this->productRepository->findWithoutFail($id);
             }
 
@@ -226,59 +225,146 @@ class ProductAPIController extends Controller
                 return $this->sendError('Product not found');
             }
             $productArray = $product->toArray();
-
-            $valueActiveOptionsGroup = [];
-            $idOptionsGroup = DB::table('option_group_market_products')->where('product_id', '=', $productArray['id'])->pluck('option_group_id')->toArray();
-            $optionsGroupRaw = $this->optionGroupRepository->whereIn('id', $idOptionsGroup)->orderBy('sort_id')->get()->toArray();
-
-            $optionsFinal = [];
-            $optionsGroupFinal = [];
-            $optionsGroupArray = $optionsGroupRaw;
-            $valueActiveOptionsGroup = DB::table('option_group_market_products')->where('product_id', '=', $productArray['id'])->pluck('active', 'option_group_id')->toArray();
-
-            foreach ($optionsGroupArray as $optionsGroup) {
-                if (isset($valueActiveOptionsGroup[$optionsGroup['id']])) {
-                    if ($valueActiveOptionsGroup[$optionsGroup['id']]) {
-                        $optionsGroup['active'] = true;
-                        $optionsGroupFinal[] = $optionsGroup;
-                    }
-                }
-            }
-            $algo = [];
-            $idsOptions = [];
-            foreach ($idOptionsGroup as $idOG) {
-                $objestOptions = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->get()->toArray();
-                foreach ($objestOptions as $valueOption) {
-                    if ($valueOption->active) {
-                        $idsOptions[] = $valueOption->option_id;
+            return $this->sendResponse($productArray, 'Producto enviado exitosamente, sin filtrar');
+        } else {
+            $valueActiveProduct = DB::table('product_categories')->where('product_id', '=', $id)->get('active');
+            if (isset($valueActiveProduct[0])) {
+                if ($valueActiveProduct[0]->active) {
+                    if (!empty($this->productRepository)) {
+                        try {
+                            $this->productRepository->pushCriteria(new RequestCriteria($request));
+                            $this->productRepository->pushCriteria(new LimitOffsetCriteria($request));
+                        } catch (RepositoryException $e) {
+                            return $this->sendError($e->getMessage());
+                        }
+                        // Desde aqui se puede conseguir las opciones y grupos de opciones
+                        // "option_groups"
+                        $product = $this->productRepository->findWithoutFail($id);
                     }
 
+                    if (empty($product)) {
+                        return $this->sendError('Product not found');
+                    }
+                    $productArray = $product->toArray();
+
+                    $valueActiveOptionsGroup = [];
+                    $idOptionsGroup = DB::table('option_group_market_products')->where('product_id', '=', $productArray['id'])->pluck('option_group_id')->toArray();
+                    $optionsGroupRaw = $this->optionGroupRepository->whereIn('id', $idOptionsGroup)->orderBy('sort_id')->get()->toArray();
+
+                    $optionsFinal = [];
+                    $optionsGroupFinal = [];
+                    $optionsGroupArray = $optionsGroupRaw;
+                    $valueActiveOptionsGroup = DB::table('option_group_market_products')->where('product_id', '=', $productArray['id'])->pluck('active', 'option_group_id')->toArray();
+
+                    foreach ($optionsGroupArray as $optionsGroup) {
+                        if (isset($valueActiveOptionsGroup[$optionsGroup['id']])) {
+                            if ($valueActiveOptionsGroup[$optionsGroup['id']]) {
+                                $optionsGroup['active'] = true;
+                                $optionsGroupFinal[] = $optionsGroup;
+                            }
+                        }
+                    }
+                    $algo = [];
+                    $idsOptions = [];
+                    foreach ($idOptionsGroup as $idOG) {
+                        $objestOptions = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->get()->toArray();
+                        foreach ($objestOptions as $valueOption) {
+                            if ($valueOption->active) {
+                                $idsOptions[] = $valueOption->option_id;
+                            }
+                        }
+                    }
+
+                    $optionsRaw = $this->optionRepository->whereIn('id', $idsOptions)->orderBy('sort_id')->get()->toArray();
+
+                    foreach ($idOptionsGroup as $idOG) {
+                        $valuesActiveOptions = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->pluck('active', 'option_id')->toArray();
+                        $optionByOptionsGroup = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->pluck('option_group_id', 'option_id')->toArray();
+
+                        foreach ($optionsRaw as $option) {
+                            if (isset($valuesActiveOptions[$option['id']])) {
+                                if ($valuesActiveOptions[$option['id']]) {
+                                    $option['option_group_id'] = $optionByOptionsGroup[$option['id']];
+                                    $optionsFinal[] = $option;
+                                }
+                            }
+                        }
+                    }
+
+                    $productArray['options'] = $optionsFinal;
+                    $productArray['option_groups'] = $optionsGroupFinal;
+
+                    return $this->sendResponse($productArray, 'Producto enviado exitosamente');
                 }
-            }
-            
-            $optionsRaw = $this->optionRepository->whereIn('id', $idsOptions)->orderBy('sort_id')->get()->toArray();
+            } else {
+                if (!empty($this->productRepository)) {
+                    try {
+                        $this->productRepository->pushCriteria(new RequestCriteria($request));
+                        $this->productRepository->pushCriteria(new LimitOffsetCriteria($request));
+                    } catch (RepositoryException $e) {
+                        return $this->sendError($e->getMessage());
+                    }
+           
+                    $product = $this->productRepository->findWithoutFail($id);
+                }
 
-            foreach ($idOptionsGroup as $idOG) {
-                $valuesActiveOptions = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->pluck('active', 'option_id')->toArray();
-                $optionByOptionsGroup = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->pluck('option_group_id', 'option_id')->toArray();
+                if (empty($product)) {
+                    return $this->sendError('Product not found');
+                }
+                $productArray = $product->toArray();
 
-                foreach ($optionsRaw as $option) {
-                    if (isset($valuesActiveOptions[$option['id']])) {
-                        if ($valuesActiveOptions[$option['id']]) {
-                            $option['option_group_id'] = $optionByOptionsGroup[$option['id']];
-                            $optionsFinal[] = $option;
+                $valueActiveOptionsGroup = [];
+                $idOptionsGroup = DB::table('option_group_market_products')->where('product_id', '=', $productArray['id'])->pluck('option_group_id')->toArray();
+                $optionsGroupRaw = $this->optionGroupRepository->whereIn('id', $idOptionsGroup)->orderBy('sort_id')->get()->toArray();
+
+                $optionsFinal = [];
+                $optionsGroupFinal = [];
+                $optionsGroupArray = $optionsGroupRaw;
+                $valueActiveOptionsGroup = DB::table('option_group_market_products')->where('product_id', '=', $productArray['id'])->pluck('active', 'option_group_id')->toArray();
+
+                foreach ($optionsGroupArray as $optionsGroup) {
+                    if (isset($valueActiveOptionsGroup[$optionsGroup['id']])) {
+                        if ($valueActiveOptionsGroup[$optionsGroup['id']]) {
+                            $optionsGroup['active'] = true;
+                            $optionsGroupFinal[] = $optionsGroup;
                         }
                     }
                 }
+                $algo = [];
+                $idsOptions = [];
+                foreach ($idOptionsGroup as $idOG) {
+                    $objestOptions = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->get()->toArray();
+                    foreach ($objestOptions as $valueOption) {
+                        if ($valueOption->active) {
+                            $idsOptions[] = $valueOption->option_id;
+                        }
+                    }
+                }
+
+                $optionsRaw = $this->optionRepository->whereIn('id', $idsOptions)->orderBy('sort_id')->get()->toArray();
+
+                foreach ($idOptionsGroup as $idOG) {
+                    $valuesActiveOptions = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->pluck('active', 'option_id')->toArray();
+                    $optionByOptionsGroup = DB::table('options_by_options_groups')->where('option_group_id', '=', $idOG)->pluck('option_group_id', 'option_id')->toArray();
+
+                    foreach ($optionsRaw as $option) {
+                        if (isset($valuesActiveOptions[$option['id']])) {
+                            if ($valuesActiveOptions[$option['id']]) {
+                                $option['option_group_id'] = $optionByOptionsGroup[$option['id']];
+                                $optionsFinal[] = $option;
+                            }
+                        }
+                    }
+                }
+
+                $productArray['options'] = $optionsFinal;
+                $productArray['option_groups'] = $optionsGroupFinal;
+
+                return $this->sendResponse($productArray, 'Producto enviado exitosamente');
             }
 
-            $productArray['options'] = $optionsFinal;
-            $productArray['option_groups'] = $optionsGroupFinal;
-
-            return $this->sendResponse($productArray, 'Producto enviado exitosamente');
+            return $this->sendResponse([], 'No se encontro el producto');
         }
-        return $this->sendResponse([], 'Producto enviado exitosamente');
-
     }
 
     /**
@@ -344,7 +430,6 @@ class ProductAPIController extends Controller
         }
 
         return $this->sendResponse($product->toArray(), __('lang.updated_successfully', ['operator' => __('lang.product')]));
-
     }
 
     /**
@@ -365,7 +450,5 @@ class ProductAPIController extends Controller
         $product = $this->productRepository->delete($id);
 
         return $this->sendResponse($product, __('lang.deleted_successfully', ['operator' => __('lang.product')]));
-
     }
-
 }

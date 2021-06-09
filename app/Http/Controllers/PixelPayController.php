@@ -47,24 +47,12 @@ class PixelPayController extends ParentOrderController
         $pixelpay_secret=DB::table('app_settings')->where('key','pixelpay_secret')->first();
         $pixelpay_key = DB::table('app_settings')->where('key', 'pixelpay_key')->first();
         //Consigue la ultima orden para determinar el ID de la proxima orden 
-        $last_order            = DB::table('orders')->get();
+        $last_order            = DB::table('orders')->orderBy('id')->limit('1')->get('id');
         $request['last_order'] = $last_order->last();
  
         $request['pixelpay_secret'] = $pixelpay_secret;
         $request['pixelpay_key']    = $pixelpay_key;
         
-        $obj_array                  = $request['ordenes'];
-        $json                       = json_encode($obj_array);
-        $base64                     = base64_encode($json);
-        $_order_content             = urlencode($base64);
-        $request['_order_content']  = $_order_content;
-
-        $obj_array = $request['ordenesExtra'];
-        $json = json_encode($obj_array);
-        $base64 = base64_encode($json);
-        $_order_extras = urlencode($base64);
-        $request['_order_extras'] = $_order_extras;
-
         return  $request->all();
     }
 

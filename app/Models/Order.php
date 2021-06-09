@@ -67,7 +67,7 @@ class Order extends Model
         'cancel_by_user',
         'nobody_accepted',
         'discount',
-
+        'payment_gateway'
     ];
 
     /**

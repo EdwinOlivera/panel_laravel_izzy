@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File name: UserAPIController.php
  * Last modified: 2020.05.04 at 09:04:09
@@ -60,7 +61,6 @@ class UserAPIController extends Controller
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 401);
         }
-
     }
 
     public function loginDriver(Request $request)
@@ -87,11 +87,9 @@ class UserAPIController extends Controller
             } else {
                 return $this->sendResponse([], 'Usuario no encontrado');
             }
-
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 401);
         }
-
     }
 
     /**
@@ -147,7 +145,6 @@ class UserAPIController extends Controller
             $this->sendError($e->getMessage(), 401);
         }
         return $this->sendResponse($user['name'], 'User logout successfully');
-
     }
 
     public function user(Request $request)
@@ -164,7 +161,8 @@ class UserAPIController extends Controller
     public function settings(Request $request)
     {
         $settings = setting()->all();
-        $settings = array_intersect_key($settings,
+        $settings = array_intersect_key(
+            $settings,
             [
                 'default_tax' => '',
                 'default_currency' => '',
@@ -228,6 +226,74 @@ class UserAPIController extends Controller
             return $this->sendError('Settings not found', 401);
         }
 
+        $sistemaInterfaz = DB::table('sistema_interfaz')->get();
+
+        // * Identificadores para los tipos de interfaz
+        //? 438585712093 = Rutas normales (No se modifica el app)
+        //? 098085908235 = muestra directamente el listado de establecimientos, sin las categorias de establecimientos
+        //? 440128575066 = Redirige al unico establecimiento que hay registro en el app
+        //? 607568578007 = Muestra la categorias de establecimientos sin la opcion de los mandaditos
+
+        if (isset($sistemaInterfaz[0])) {
+            $settings['codigo_interfaz'] = $sistemaInterfaz[0]->codigo;
+            $settings['enable_mandaditos'] = '0';
+
+            switch ($sistemaInterfaz[0]->codigo) {
+                case "438585712093":
+                    $settings['direccion_home'] = '/HomeCategories';
+                    $settings['enable_mandaditos'] = '1';
+                    break;
+                case "098085908235":
+
+                    $settings['direccion_home'] = '/HomeMarkets';
+                    $idCategoria = DB::table('fields')->get(['id'])->first()->id;
+
+                    $settings['codigo_categoria'] = $idCategoria;
+
+                    break;
+                case "440128575066":
+
+
+                    $datosEstablecimientos = DB::table('markets')->limit(1)->get(['id', 'type_market_id']);
+                    // * Tipos de establecimientos
+                    // ? Normal = 1
+                    // ? Tienda de conveniencia = 2
+                    // ? Supermercado = 3
+                    
+                    // * Rutas para cada tipo de establecimiento
+                    // '/Details'
+                    // '/DetailsConvenienceStore'
+                    // '/DetailsSupermarket'
+                    switch ((string) $datosEstablecimientos[0]->type_market_id) {
+                        case "1":
+                            $settings['direccion_home'] = '/Details';
+                            break;
+                        case "2":
+                            $settings['direccion_home'] = '/DetailsConvenienceStore';
+                            break;
+                        case "3":
+                            $settings['direccion_home'] = '/DetailsSupermarket';
+                            break;
+                    }
+
+
+                    $settings['codigo_establecimiento'] = $datosEstablecimientos[0]->id;
+                    break;
+                case "607568578007":
+                    $settings['direccion_home'] = '/HomeCategories';
+
+                    break;
+
+                default:
+                    $settings['direccion_home'] = '/HomeCategories';
+                    $settings['enable_mandaditos'] = '1';
+            }
+        } else {
+            $settings['codigo_interfaz'] = '438585712093';
+        }
+
+
+        // $settings
         return $this->sendResponse($settings, 'Settings retrieved successfully');
     }
 
@@ -239,7 +305,6 @@ class UserAPIController extends Controller
         $settnigEnviados['data'] = $encargo_setting->where('id', 1)->first();
         $settnigEnviados['enviado'] = 'Sin errores';
         return $settnigEnviados;
-
     }
     /**
      * Update the specified User in storage.
@@ -291,7 +356,6 @@ class UserAPIController extends Controller
         } else {
             return $this->sendError('Reset link not sent', 401);
         }
-
     }
 
     public function loginWithFacebook(Request $request)
@@ -335,11 +399,9 @@ class UserAPIController extends Controller
                         ->toMediaCollection('avatar');
                 }
             }
-
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 401);
         }
-
     }
 
     /**
@@ -388,7 +450,6 @@ class UserAPIController extends Controller
                         ->toMediaCollection('avatar');
                 }
             }
-
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 401);
         }
@@ -438,11 +499,9 @@ class UserAPIController extends Controller
                         ->toMediaCollection('avatar');
                 }
             }
-
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 401);
         }
-
     }
 
     /**
@@ -491,12 +550,10 @@ class UserAPIController extends Controller
                         ->toMediaCollection('avatar');
                 }
             }
-
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 401);
         }
 
         return $this->sendResponse($user, 'User retrieved successfully');
     }
-
 }

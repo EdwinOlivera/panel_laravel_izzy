@@ -94,9 +94,9 @@ Route::resource('polygon_zone', 'API\PolygonZoneAPIController');
 Route::middleware('auth:api')->group(function () {
     Route::group(['middleware' => ['role:driver']], function () {
         Route::prefix('driver')->group(function () {
-            Route::resource('orders', 'API\OrderAPIControllerFixed');
+            Route::resource('orders', 'API\OrderAPIController');
             //Nuevo
-            Route::resource('encargos', 'API\EncargoAPIController');
+            // Route::resource('encargos', 'API\EncargoAPIController');
 
             Route::resource('notifications', 'API\NotificationAPIController');
             Route::post('users/{id}', 'API\UserAPIController@update');
@@ -123,10 +123,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('favorites/exist', 'API\FavoriteAPIController@exist');
     Route::resource('favorites', 'API\FavoriteAPIController');
 
-    Route::resource('orders', 'API\OrderAPIControllerFixed');
-    Route::get('orden/verificar', 'API\OrderAPIControllerFixed@revisarOrden');
-    Route::get('orden/check', 'API\OrderAPIControllerFixed@checkStatusOrder');
-    Route::get('orden/check_user', 'API\OrderAPIControllerFixed@checkStatusOrderUser');
+    Route::resource('orders', 'API\OrderAPIController');
+    Route::get('orden/verificar', 'API\OrderAPIController@revisarOrden');
+    Route::get('orden/check', 'API\OrderAPIController@checkStatusOrder');
+    Route::get('orden/check_user', 'API\OrderAPIController@checkStatusOrderUser');
 
     Route::resource('product_orders', 'API\ProductOrderAPIControllerFixed');
 
@@ -134,6 +134,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('carts/count', 'API\CartAPIController@count')->name('carts.count');
     Route::resource('carts', 'API\CartAPIController');
+    Route::get('carts/deleteAll/{id}', 'API\CartAPIController@destroyAll');
 
     Route::resource('delivery_addresses', 'API\DeliveryAddressAPIController');
 

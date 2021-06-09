@@ -209,13 +209,11 @@
 </div>
 
 <div class="container-fluid">
-
     <div class="row">
         <div class="marco_decorativo justify-content-center col-3 py-2">
-
             {!! Form::label('Categories', trans('Categoria (s)'), ['class' => 'col-12 control-label text-center']) !!}
 
-            <div class=" ">
+            <div id="div_categorias">
                 <div class="row">
                     <div class="col-11 ml-3">
                         {!! Form::select('categoriesProducts[]', [], [], ['class' => 'select2 form-control', 'id' =>
@@ -223,59 +221,60 @@
                     </div>
                 </div>
 
-                <a   data-placement="bottom" title="{{ trans('Crear y añadir una Categoria nueva') }}"
+                <a data-placement="bottom" title="{{ trans('Crear y añadir una Categoria nueva') }}"
                     style="color: black" onClick="setMarketIdSelectCategories({{ $market->id }})"
                     class="CuartoDeCentrado" data-toggle="modal" data-target="#createCategoryModal">
                     <i class="fa fa-plus-circle cruz_circulo"></i>
                 </a>
-                <a   id="mSeleccionarCategorias" data-placement="bottom"
+                <a  id="mSeleccionarCategorias" data-placement="bottom"
                     title="{{ trans('Añadir una Categoria ya existente') }}" style="color: black"
                     class="CuartoDeCentrado">
                     <i class="fa fa-plus-square cruz_cuadrado"></i>
                 </a>
-
             </div>
             <ul class="sort_category list-group">
                 @foreach ($categoriesProducts as $category)
-                    <li class="list-group-item  btn btn-success item "
+                    <li id='{{ $category->id }}' class="list-group-item  btn btn-success item "
                         onclick="selectCategory({{ $category->id }},{{ count($categoriesProducts) }})"
-                        id='{{ $category->id }}' data-id="{{ $category->id }}">
+                         data-id="{{ $category->id }}">
                         @can('categories.destroy')
-                            <a   class="pr-2" onClick="removeCategoryFromMarket({{ $category->id }})"
-                                title="{{ trans('Remover categoria de este establecimiento') }}">
-                                <i class="fa fa-minus-circle text-danger"></i>
-                            </a>
+                        
+                        <a class="pr-2" onClick="removeCategoryFromMarket({{ $category->id }})"
+                            title="{{ trans('Remover categoria de este establecimiento') }}">
+                            <i class="fa fa-minus-circle text-danger"></i>
+                        </a>
                         @endcan
                         @if ($category->active == '0')
-                            <span id="{{ $category->id }}_category_name"
-                                class="desactivado alinearIzquierda textoNombre col-8 ">
-                                {{ $category->name }}
-                            </span>
+                        
+                        <span id="{{ $category->id }}_category_name"
+                            class="desactivado alinearIzquierda textoNombre col-8 ">
+                            {{ $category->name }}
+                        </span>
                         @else
-                            <span id="{{ $category->id }}_category_name" class="alinearIzquierda textoNombre col-8 ">
-                                {{ $category->name }}
-                            </span>
+                        
+                        <span id="{{ $category->id }}_category_name" class="alinearIzquierda textoNombre col-8 ">
+                            {{ $category->name }}
+                        </span>
                         @endif
+                        
                         <span class="handle">
                             <i class="fa fa-sort"></i>
                         </span>
+
                         @can('categories.edit')
-                            <a  data-toggle="modal" title="{{ trans('Editar esta categoria') }}"
-                                onClick="setDateCategoryUpdate({{ $category->id }}, '{{ $category->name }}', '{{ $category->description }}',{{ $category->active }})"
-                                data-target="#UpdateCategoryModal">
+                        <a data-toggle="modal" title="{{ trans('Editar esta categoria') }}"
+                        onClick="setDateCategoryUpdate({{ $category->id }}, '{{ $category->name }}', '{{ $category->description }}',{{ $category->active }})"
+                        data-target="#UpdateCategoryModal">
                                 <i class=" fa fa-edit btnEditar" ></i>
-                            </a>
+                        </a>
                         @endcan
                         @can('categories.destroy')
 
-                            <a  
-                                onClick="alternarActivacionCategoria({{ $category->id }},'{{ $category->name }}','{{ $category->description }}',{{ $category->active }})">
-                                <i class="fa fa-low-vision btn btn-link text-danger"></i>
-
-                            </a>
+                        <a onClick="alternarActivacionCategoria({{ $category->id }},'{{ $category->name }}','{{ $category->description }}',{{ $category->active }})">
+                            <i class="fa fa-low-vision btn btn-link text-danger"></i>
+                        </a>
                         @endcan
                     </li>
-
                 @endforeach
             </ul>
         </div>
@@ -344,134 +343,16 @@
 </div>
 
 
-<!-- Save Field -->
+<!-- boton de regreso -->
 <div class="form-group col-12 text-right">
-    {{-- <button type="submit" class="btn btn-{{setting('theme_color')}}"><i class="fa fa-save"></i> {{trans('lang.save')}} {{trans('Cambios')}}</button> --}}
-    {{-- <a href="{!!  route('markets.index') !!}" class="btn btn-{{ setting('theme_color') }}"><i class="fa fa-save"></i>
-    {{ trans('lang.save') }}{{ trans('Cambios') }}</a> --}}
+
     <a href="{!!  route('markets.index') !!}" class="btn btn-default"><i class="fa fa-undo"></i>
         {{ trans('Volver') }}</a>
 </div>
 
 {{-- Modals --}}
-<div class="modal fade" id="productEditModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header bg-blue">
-                <h4 class="modal-title" id="myModalLabel">Editar Producto</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-            </div>
-
-            <div class="modal-body">
-                <form class="form-horizontal">
-                    <input type="hidden" id="mhdnIdProduct">
-                    <input type="hidden" id="mtxtMarketId">
-                    <input type="hidden" id="mtxtCategoryId">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label">Nombre</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="mtxtNombre" class="form-control" id="mtxtNombre"
-                                    placeholder="">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label">Precio</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="mtxtPrice" class="form-control" id="mtxtPrice" value="">
-                            </div>
-                        </div>
-
-                        {{-- <div class="form-group">
-                  <label class="col-sm-7 control-label">Disponible</label>
-                  <div class="col-sm-9"> --}}
-                        {{-- <input type="text" name="mtxtDisponible" class="form-control" id="mtxtDisponible"> --}}
-                        {{-- <div class="checkbox icheck">
-                        <label class="col-9 ml-2 form-check-inline">
-                            {!!  Form::hidden('#mtxtDisponible', 0) !!}
-                            {!!  Form::checkbox('#mtxtDisponible', 1, null) !!}
-                        </label>
-                    </div> --}}
-                        {{-- </div> --}}
-                        {{-- </div> --}}
-                    </div>
-                </form>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="mbtnCerrarModal" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-info" id="mbtnUpdProduct">Actualizar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="selectCategoryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-m" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header bg-blue">
-                <h4 class="modal-title" id="myModalLabel">Agregar categorias</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-            </div>
-
-            <div class="modal-body">
-                <input type="hidden" id="idMarketModal">
-                <!-- Categories Field -->
-                <div class="form-group row ">
-                    {!! Form::label('categoriesProducts[]', trans('lang.product_categories_id'), ['class' => 'col-3
-                    control-label text-right']) !!}
-                    <div class="col-9">
-
-                        {{-- {!!  Form::select('categoriesProducts[]', [], [], ['class' => 'select2 form-control', 'id' => 'inputSelectCategory', 'multiple' => 'multiple']) !!} --}}
-                        <div class="form-text text-muted">{{ trans('Buscar entre las categorias existentes') }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="mCerrarModalSelectCategoria"
-                    data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-info" id="mSeleccionarCategorias_old">Seleccionar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="addProductsFromCategory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-m" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header bg-blue">
-                <h4 class="modal-title" id="myModalLabel">Añadir o remover Categoria</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-            </div>
-
-            <div class="modal-body">
-                <input type="hidden" id="idCategorySelectsProducts">
-
-                {{-- <div class="form-group row ">
-                {!!  Form::label('product_id', trans('lang.option_product_id'), ['class' => 'col-3 control-label text-right']) !!}
-                <div class="col-9">
-                  {!!  Form::select('product_id', $products, [], ['class' => 'select2 form-control', 'id' => 'products_select2', 'multiple' => 'multiple']) !!}
-                  <div class="form-text text-muted">{{ trans("lang.option_product_id_help") }}</div>
-                </div>
-            </div> --}}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="mCerraAddProducts"
-                    data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-info" id="mSelectsProducts">Seleccionar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+{{-- Categorias --}}
 <div class="modal fade" id="createCategoryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-m" role="document">
         <div class="modal-content">
@@ -584,30 +465,164 @@
     </div>
 </div>
 
-<div class="modal fade" id="selectProductReady" tabindex="-1" role="dialog" aria-labelledby="myModalLabelProductReady">
+{{-- Grupo de opciones --}}
+<div class="modal fade" id="ModalCreatGrupoOpcion" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabelCreateGrupoOption">
+
     <div class="modal-dialog modal-m" role="document">
         <div class="modal-content">
 
             <div class="modal-header bg-blue">
-                <h4 class="modal-title" id="myModalLabelProductReady">Seleccionar producto</h4>
+                <h4 class="modal-title" id="myModalLabelCreateGrupoOption">Crear Grupo de opciones</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
             </div>
 
             <div class="modal-body">
+                <form class="form-horizontal">
+                    <input type="hidden" id="mOptionGroupIdProduct">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label" for="mtxtNombreGroup">Nombre</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="mtxtNombreGroup" class="form-control" id="mtxtNombreGroup"
+                                    placeholder="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label" for="chkForceSelect">Activo</label>
+                            <div class="col-sm-9">
+                                <div class="checkbox icheck">
+                                    <label class="col-9 ml-2 form-check-inline">
+                                        <input type="checkbox" checked name="mActive" id="mActive"
+                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label" for="mtxtNombreAdmin">Nombre Administrativo</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="mtxtNombreAdmin" class="form-control" id="mtxtNombreAdmin"
+                                    placeholder="">
+                            </div>
+                        </div>
 
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label" for="chkMultiSelect">Multi seleccionable</label>
+                            <div class="col-sm-9">
+                                <div class="checkbox icheck">
+                                    <label class="col-9 ml-2 form-check-inline">
+                                        <input type="checkbox" name="chkMultiSelect" id="multi"
+                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-12 control-label" for="cant_selectable">Cantidad seleccionable</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" min="1"  placeholder="3" id="cant_selectable"
+                                    name="cant_selectable" type="number">
+                            </div>
+                        </div>
 
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label" for="chkForceSelect">Obligatorio</label>
+                            <div class="col-sm-9">
+                                <div class="checkbox icheck">
+                                    <label class="col-9 ml-2 form-check-inline">
+                                        <input type="checkbox" class="iCheck" name="chkForceSelect" id="forceSelect"
+                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="mCerrarModalSeleccionarProducto"
+                <button type="button" class="btn btn-default" id="mbtnCerrarGrupoOpcionesModal"
                     data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-info" id="mSeleccionarProducto">Crear</button>
+                <button type="button" class="btn btn-info" id="mCreateGrupoOpciones">Crear</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade" id="ModalUpdateGrupoOpcion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-m" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header bg-blue">
+                <h4 class="modal-title" id="myModalLabel">Actualizar Grupo de opciones</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <input type="hidden" id="mOptionGroupIdProductUPDATE">
+                    <input type="hidden" id="mIdGrupo">
+
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label" for="mtxtNombreGroupUPDATE">Nombre</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="mtxtNombreGroupUPDATE" class="form-control"
+                                    id="mtxtNombreGroupUPDATE" placeholder="">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class=" control-label" for="chkActive">Activo</label>
+                            <input type="checkbox" name="mActiveUpdate" id="mActiveUpdate">
+
+                            <div class="form-group">
+                                <label class="col-sm-7 control-label" for="mtxtNombreAdminUPDATE">Nombre
+                                    Administrativo</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="mtxtNombreAdminUPDATE" class="form-control"
+                                        id="mtxtNombreAdminUPDATE" placeholder="">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class=" control-label" for="chkMultiSelectUPDATE">Multi seleccionable</label>
+                                <input type="checkbox" name="chkMultiSelectUPDATE" id="multiUPDATE">
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-12 control-label" for="cant_selectableUPDATE">Cantidad seleccionable</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" min="1" value="1" placeholder="3"
+                                        id="cant_selectableUPDATE" name="cant_selectable" type="number">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="chkForceSelectUPDATE">Forzar Selección</label>
+                                <input type="checkbox" name="chkForceSelectUPDATE" id="forceSelectUPDATE">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="mbtnCerrarGrupoOpcionesModalUPDATE"
+                    data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-info" id="mUpdateGrupoOpciones">Actualizar</button>
             </div>
         </div>
     </div>
 </div>
 
+{{-- Opciones --}}
 <div class="modal fade" id="ModalCreateOpcion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-m" role="document">
         <div class="modal-content">
@@ -712,171 +727,12 @@
 
 </div>
 
-<div class="modal fade" id="ModalCreatGrupoOpcion" tabindex="-1" role="dialog"
-    aria-labelledby="myModalLabelCreateGrupoOption">
-
-    <div class="modal-dialog modal-m" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header bg-blue">
-                <h4 class="modal-title" id="myModalLabelCreateGrupoOption">Crear Grupo de opciones</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-            </div>
-
-            <div class="modal-body">
-                <form class="form-horizontal">
-                    <input type="hidden" id="mOptionGroupIdProduct">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label" for="mtxtNombreGroup">Nombre</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="mtxtNombreGroup" class="form-control" id="mtxtNombreGroup"
-                                    placeholder="">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label" for="chkForceSelect">Activo</label>
-                            <div class="col-sm-9">
-                                <div class="checkbox icheck">
-                                    <label class="col-9 ml-2 form-check-inline">
-                                        <input type="checkbox" checked name="mActive" id="mActive"
-                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;">
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label" for="mtxtNombreAdmin">Nombre Administrativo</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="mtxtNombreAdmin" class="form-control" id="mtxtNombreAdmin"
-                                    placeholder="">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label" for="chkMultiSelect">Multi seleccionable</label>
-                            <div class="col-sm-9">
-                                <div class="checkbox icheck">
-                                    <label class="col-9 ml-2 form-check-inline">
-                                        <input type="checkbox" name="chkMultiSelect" id="multi"
-                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;">
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-12 control-label" for="cant_selectable">Cantidad seleccionable.</label>
-                            <div class="col-sm-9">
-                                <input class="form-control" min="1" value="1" placeholder="3" id="cant_selectable"
-                                    name="cant_selectable" type="number">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label" for="chkForceSelect">Forzar Selección</label>
-                            <div class="col-sm-9">
-                                <div class="checkbox icheck">
-                                    <label class="col-9 ml-2 form-check-inline">
-                                        <input type="checkbox" class="iCheck" name="chkForceSelect" id="forceSelect"
-                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;">
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </form>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="mbtnCerrarGrupoOpcionesModal"
-                    data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-info" id="mCreateGrupoOpciones">Crear</button>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<div class="modal fade" id="ModalUpdateGrupoOpcion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-m" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header bg-blue">
-                <h4 class="modal-title" id="myModalLabel">Actualizar Grupo de opciones</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-            </div>
-
-            <div class="modal-body">
-                <form class="form-horizontal">
-                    <input type="hidden" id="mOptionGroupIdProductUPDATE">
-                    <input type="hidden" id="mIdGrupo">
-
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label class="col-sm-7 control-label" for="mtxtNombreGroupUPDATE">Nombre</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="mtxtNombreGroupUPDATE" class="form-control"
-                                    id="mtxtNombreGroupUPDATE" placeholder="">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class=" control-label" for="chkActive">Activo</label>
-                            <input type="checkbox" name="mActiveUpdate" id="mActiveUpdate">
-
-                            <div class="form-group">
-                                <label class="col-sm-7 control-label" for="mtxtNombreAdminUPDATE">Nombre
-                                    Administrativo</label>
-                                <div class="col-sm-9">
-                                    <input type="text" name="mtxtNombreAdminUPDATE" class="form-control"
-                                        id="mtxtNombreAdminUPDATE" placeholder="">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class=" control-label" for="chkMultiSelectUPDATE">Multi seleccionable</label>
-                                <input type="checkbox" name="chkMultiSelectUPDATE" id="multiUPDATE">
-
-                            </div>
-                            <div class="form-group">
-                                <label class="col-12 control-label" for="cant_selectableUPDATE">Cantidad seleccionable.</label>
-                                <div class="col-sm-9">
-                                    <input class="form-control" min="1" value="1" placeholder="3"
-                                        id="cant_selectableUPDATE" name="cant_selectable" type="number">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label" for="chkForceSelectUPDATE">Forzar Selección</label>
-                                <input type="checkbox" name="chkForceSelectUPDATE" id="forceSelectUPDATE">
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="mbtnCerrarGrupoOpcionesModalUPDATE"
-                    data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-info" id="mUpdateGrupoOpciones">Actualizar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <script src="https://unpkg.com/jquery@2.2.4/dist/jquery.js"></script>
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <link href="https://code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css" />
 @prepend('scripts')
     <script type="text/javascript">
-        //======================================================================
-        // LOADING
-        //======================================================================
+
         var Loading = (loadingDelayHidden = 0) => {
 
             //-----------------------------------------------------
@@ -959,7 +815,6 @@
             console.log("ID del establecimiento: "+{{ $market->id }});
             searchCategory();
             searchOptionGroup();
-            porbarLocalStore();
             searchOption();
             var idCategory = getIdCategoryLocalStore();
             var idProduct = getIdProductLocalStore();
@@ -1008,20 +863,7 @@
         });
 
         // Funciones Para LocalStore
-        function porbarLocalStore() {
-            if (typeof(Storage) !== "undefined") {
-                localStorage.setItem("idMarket", {{ $market->id }});
-                localStorage.setItem("titulo", "Curso de Angular avanzado - Víctor Robles");
-                var idMarket = localStorage.getItem("idMarket");
-                var idCategory = localStorage.getItem("idCategory");
-                localStorage.removeItem("titulo");
-
-            } else {
-
-            }
-
-        }
-
+        
         function savedIdCategoryLocalStore(idCategory) {
             if (typeof(Storage) !== "undefined") {
                 localStorage.setItem("idCategory", idCategory);
@@ -1074,13 +916,7 @@
                 savedIdCategoryLocalStore(idCategory);
             }
         }
-function guardarIdProduct(idProduct){
 
-}
-
-function conseguirIdProduct(){
-
-}
         function darFormatoPrecio(precio) {
             const formatter = new Intl.NumberFormat('es-HN', {
                 style: 'currency',
@@ -1089,104 +925,6 @@ function conseguirIdProduct(){
             });
 
             return formatter.format(precio);
-        }
-
-        $('#mbtnUpdProduct').click(function() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-
-            var idP = $('#mhdnIdProduct').val();
-            var nom = $('#mtxtNombre').val();
-            var pri = $('#mtxtPrice').val();
-            var dis = $('#mtxtDisponible').val();
-
-
-            $('#mbtnCerrarModal').click();
-            $.ajax({
-                url: '{!!  url("product/updateModal") !!}',
-                method: 'GET',
-                data: {
-                    id: idP,
-                    name: nom,
-                    price: pri,
-                    featured: dis,
-
-                },
-                success: function(res) {
-                    $('#mbtnCerrarModal').click();
-                    location.reload();
-
-                }
-            })
-
-        });
-
-
-
-        // Funciones de elminaciones
-        function deleteProduct(idRecibida) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-
-            $.ajax({
-                url: '{!!  url("product/destroyAlt") !!}',
-                method: 'get',
-                data: {
-                    id: idRecibida
-                },
-                success: function() {
-                    location.reload();
-                }
-
-            });
-
-
-        }
-
-        function deleteGrupoOptions(idOptionGroup, idProduct) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-            $.ajax({
-                url: '{!!  url("optionGroups/destroyAlt") !!}',
-                method: 'get',
-                data: {
-                    id: idOptionGroup
-                },
-                success: function() {
-                    document.getElementById('listaOpciones').innerHTML = '';
-                    recargrarGrupoOpciones(idProduct);
-                }
-
-            });
-        }
-
-        function deleteOption(IdOption, idOptionGroup, IdProduct) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-
-            $.ajax({
-                url: '{!!  url("options/destroyAlt") !!}',
-                method: 'get',
-                data: {
-                    id: IdOption
-                },
-                success: function() {
-                    recargrarOpciones(idOptionGroup, IdProduct);
-                }
-
-            });
         }
 
         // Funciones para las categorias
@@ -1217,26 +955,6 @@ function conseguirIdProduct(){
             $('#nameCategoryUpdateModal').val(name);
 
             $('#descripcionCategoryUpdateModal').val(descriptionFilter);
-        }
-
-        function removeCategory(idCategory, idMarket) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-            $.ajax({
-                url: '{!!  url("categories/remove") !!}',
-                method: 'get',
-                data: {
-                    id: idCategory,
-                    idM: idMarket,
-                },
-                success: function() {
-                    location.reload();
-                }
-
-            });
         }
 
         function alternarActivacionCategoria(idCategory, nameCategory, descriptionCat, activeC) {
@@ -1441,14 +1159,19 @@ function conseguirIdProduct(){
             });
         }
         // Funciones para los Productos
-        function getProduct(idCategory, idProduct) {
+        function getProduct(idCategory, idProduct, recargandoProducto = false) {
             var priceProduct = 0;
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             });
-            document.getElementById('listaProductos').innerHTML = 'Buscando productos . . . ';
+            if(recargandoProducto){
+                document.getElementById('listaProductos').innerHTML = 'Recargando productos . . . ';
+            }else{
+
+                document.getElementById('listaProductos').innerHTML = 'Buscando productos . . . ';
+            }
             $.ajax({
                 url: '{!!  url("products/getproductbycategory") !!}',
                 method: 'get',
@@ -1459,99 +1182,95 @@ function conseguirIdProduct(){
                 success: function(res) {
                     vaciarSelects2();
                     document.getElementById('btnAgregarProductos').innerHTML = `
-                    <a href="createFromMarket/{{ $market->id }}" class="CuartoDeCentrado" onClick="savedIdCategoryLocalStore(${idCategory})" title="{{ trans('Crear y añadir un nuevo producto') }}"  style="color: black"  >
+                        <a href="createFromMarket/{{ $market->id }}" class="CuartoDeCentrado" onClick="savedIdCategoryLocalStore(${idCategory})" title="{{ trans('Crear y añadir un nuevo producto') }}"  style="color: black"  >
                             <i class="fa fa-plus-circle cruz_circulo"   ></i>
-                    </a>
-                    <a   id="IDProductosParaAgregar" onClick="AgregarProductos(${idCategory})" class="CuartoDeCentrado" data-placement="bottom" title="{{ trans('Añadir productos existente') }}" style="color: black"  >
-                        <i class="fa fa-plus-square cruz_cuadrado"  ></i>  
-                    </a>
-            `;
+                        </a>
+                        <a   id="IDProductosParaAgregar" onClick="AgregarProductos(${idCategory})" class="CuartoDeCentrado" data-placement="bottom" title="{{ trans('Añadir productos existente') }}" style="color: black"  >
+                            <i class="fa fa-plus-square cruz_cuadrado"  ></i>  
+                        </a>
+                    `;
                     if ((res).length > 0) {
 
 
 
-                        document.getElementById('listaProductos').innerHTML = `
-                    
-                    <ul class="sort_products list-group " id='sort_products_sort'>
-                        
-                    </ul>
-                    `;
+                    document.getElementById('listaProductos').innerHTML = `
+                            <ul class="sort_products list-group " id='sort_products_sort'>
 
-                        res.forEach(product => {
-                            
-                            priceProduct = darFormatoPrecio(product["price"]);
+                            </ul>
+                        `;
+                            res.forEach(product => {
+                                
+                                priceProduct = darFormatoPrecio(product["price"]);
 
-                            if (product['featured'] == '1') {
-                                document.getElementById('sort_products_sort').innerHTML += `
-                                    <li class="list-group-item  btn btn-success item" id='${product['id']}'  data-id="${product['id']}">
-                                        @can('products.destroy')    
-                                                <a   onClick="removeProductsFromCategory(${product['id']},${idCategory})" title="{{ trans('Eliminar de la categoria actual') }}">
-                                                    <i class="fa fa-minus-circle text-danger" ></i>
-                                                </a>
-                                        @endcan
+                                if (product['featured'] == '1') {
+                                    document.getElementById('sort_products_sort').innerHTML += `
+                                        <li class="list-group-item  btn btn-success item" id='${product['id']}_producto'  data-id="${product['id']}">
+                                            @can('products.destroy')    
+                                                    <a   onClick="removeProductsFromCategory(${product['id']},${idCategory})" title="{{ trans('Eliminar de la categoria actual') }}">
+                                                        <i class="fa fa-minus-circle text-danger" ></i>
+                                                    </a>
+                                            @endcan
 
-                                        <div id="${product['id']}_name" class="textoNombre col-8" onclick="getCategoriAndOptionGroupByProduct(${product['id']}, ${res.length},'${product['name']}')">
-                                            ${product['name']}
-                                            <div  class="textoNombre" >
-                                                <b> ${priceProduct}</b>
+                                            <div id="${product['id']}_name" class="textoNombre col-8" onclick="seleccionarProducto(${product['id']}, ${res.length},'${product['name']}')">
+                                                ${product['name']}
+                                                <div  class="textoNombre" >
+                                                    <b> ${priceProduct}</b>
+                                                </div>
+                                                
                                             </div>
-                                            
-                                        </div>
-                                        <span class="handle">
-                                            <i class="fa fa-sort"></i>
-                                        </span>
+                                            <span class="handle">
+                                                <i class="fa fa-sort"></i>
+                                            </span>
 
-                                        @can('products.edit')    
+                                            @can('products.edit')    
 
-                                                <a href="editFromMarket/${product['id']}"  onClick="savedIdProductAndIdCategoryLocalStore(${product['id']},${idCategory})">
-                                                    <i class=" fa fa-edit btnEditar"></i>
-                                                </a>
-                                        @endcan
-                                        @can('products.destroy')
+                                                    <a href="editFromMarket/${product['id']}"  onClick="savedIdProductAndIdCategoryLocalStore(${product['id']},${idCategory})">
+                                                        <i class=" fa fa-edit btnEditar"></i>
+                                                    </a>
+                                            @endcan
+                                            @can('products.destroy')
 
-                                                <a   onClick="cambiarDisponibilidad(${product['id']},${product['featured']},${idCategory})">
-                                                    <i class="fa fa-low-vision btn btn-link text-danger"></i>
-                                                </a>
-                                        @endcan
-                                    </li>
+                                                    <a   onClick="cambiarDisponibilidad(${product['id']},${product['featured']},${idCategory})">
+                                                        <i class="fa fa-low-vision btn btn-link text-danger"></i>
+                                                    </a>
+                                            @endcan
+                                        </li>
+                                    `;
 
-                                `;
-
-                            } else {
-                                document.getElementById('sort_products_sort').innerHTML += `
-                        
-                            <li class="list-group-item  btn btn-success item" id='${product['id']}'  data-id="${product['id']}">
-                            @can('products.destroy')    
-                                    <a   onClick="removeProductsFromCategory(${product['id']},${idCategory})" title="{{ trans('Eliminar de la categoria actual') }}">
-                                        <i class="fa fa-minus-circle text-danger"></i>
-                                    </a>
-                            @endcan
-
-                            <div id="${product['id']}_name" class="textoNombre col-8" onclick="getCategoriAndOptionGroupByProduct(${product['id']}, ${res.length}, '${product['name']}')">
-                                <div class="desactivado">
-                                        ${product['name']}
-                                </div>
-                                <div  class=" Limpiar" >
-                                        <b> ${priceProduct}</b>
-                                </div>
-                            </div>
-                            <span class="handle">
-                                <i class="fa fa-sort"></i>
-                            </span>
+                                } else {
+                                    document.getElementById('sort_products_sort').innerHTML += `
                             
-                            @can('products.edit')    
-                                    <a href="editFromMarket/${product['id']}"  onClick="savedIdProductAndIdCategoryLocalStore(${product['id']},${idCategory})">
-                                        <i class=" fa fa-edit btnEditar"></i>
-                                    </a>
-                            @endcan
-                            @can('products.destroy')
+                                <li class="list-group-item  btn btn-success item" id='${product['id']}_producto'  data-id="${product['id']}">
+                                @can('products.destroy')    
+                                        <a   onClick="removeProductsFromCategory(${product['id']},${idCategory})" title="{{ trans('Eliminar de la categoria actual') }}">
+                                            <i class="fa fa-minus-circle text-danger"></i>
+                                        </a>
+                                @endcan
 
-                                    <a   onClick="cambiarDisponibilidad(${product['id']},${product['featured']},${idCategory})">
-                                        <i class="fa fa-low-vision btn btn-link text-danger"></i>
-                                    </a>
-                            @endcan
-                        </li>
-                    `;
+                                <div id="${product['id']}_name" class="textoNombre col-8" onclick="seleccionarProducto(${product['id']}, ${res.length}, '${product['name']}')">
+                                    <div class="desactivado">
+                                            ${product['name']}
+                                    </div>
+                                    <div  class=" Limpiar" >
+                                            <b> ${priceProduct}</b>
+                                    </div>
+                                </div>
+                                <span class="handle">
+                                    <i class="fa fa-sort"></i>
+                                </span>
+                                
+                                @can('products.edit')    
+                                        <a href="editFromMarket/${product['id']}"  onClick="savedIdProductAndIdCategoryLocalStore(${product['id']},${idCategory})">
+                                            <i class=" fa fa-edit btnEditar"></i>
+                                        </a>
+                                @endcan
+                                @can('products.destroy')
+                                        <a   onClick="cambiarDisponibilidad(${product['id']},${product['featured']},${idCategory})">
+                                            <i class="fa fa-low-vision btn btn-link text-danger"></i>
+                                        </a>
+                                @endcan
+                                </li>
+                        `;
                             }
 
                         });
@@ -1604,7 +1323,7 @@ function conseguirIdProduct(){
                     `;
                     }
                     if (idProduct != null) {
-                        document.getElementById(idProduct).className += ' select';
+                        document.getElementById(idProduct+"_producto").className += ' select';
                     }
                 }
 
@@ -1639,8 +1358,8 @@ function conseguirIdProduct(){
                     if (res['success'] == 'true') {
 
                         vaciarSelects2();
-                        // getProduct(idCategory);
-                        recargarProductos(idCategory);
+
+                        recargarProductos(idCategory,idProducto);
 
                     } else {
                     }
@@ -1650,22 +1369,13 @@ function conseguirIdProduct(){
 
         }
 
-        selectProduct = function(idProduct, nombre, price, disponible) {
-            $('#mhdnIdProduct').val(idProduct);
-            $('#mtxtNombre').val(nombre);
-            $('#mtxtPrice').val(price);
-            $('#mtxtDisponible').val(disponible);
-            vaciarSelects2();
-
-        };
-
         function AgregarProductos(idCategory) {
 
 
             const IDSP = $('#IDProductosParaAgregar').val();
 
             if (IDSP != null) {
-            vaciarSelects2();
+                vaciarSelects2();
                 vaciarListaOpciones();
                 vaciarListaGrupoOpciones();
                 $.ajaxSetup({
@@ -1683,7 +1393,6 @@ function conseguirIdProduct(){
                         products: IDSP,
                     },
                     success: function(res) {
-                        // alert(res);
                         recargarProductos(idCategory);
                     }
                 })
@@ -1714,21 +1423,22 @@ function conseguirIdProduct(){
             });
         }
 
-        function recargarProductos(idCategory) {
-            getProduct(idCategory);
+        function recargarProductos(idCategory, idProducto) {
+            getProduct(idCategory,idProducto,true);
         }
         // Funciones para las categorias (Obsoleto)
-        function getCategoriAndOptionGroupByProduct(idProduct, countProduct, pName) {
+        function seleccionarProducto(idProduct, countProduct, pName) {
             var target = $('.sort_products');
             var sortData = target.sortable('toArray', {
                 attribute: 'data-id'
             })
 
             for (let index = 0; index < countProduct; index++) {
-                document.getElementById(sortData[index]).className = 'list-group-item  btn btn-success item';
+                document.getElementById(sortData[index]+"_producto").className = 'list-group-item  btn btn-success item';
             }
             vaciarSelects2();
-            document.getElementById(idProduct).className += ' select';
+            document.getElementById(idProduct+"_producto").className += ' select';
+
             savedIdProductLocalStoreFromSearchOptionGroup(idProduct)
             selectIdProduct(idProduct);
             vaciarListaOpciones();
@@ -1768,7 +1478,7 @@ function conseguirIdProduct(){
                             if (category != null) {
                                 document.getElementById('listaCategorias_sort').innerHTML += `
 
-                                <li  class="list-group-item "id="${category['id']}_category" data-id="${category['id']}_category">
+                                <li  class="list-group-item "id="${category['id']}_category" data-id="${category['id']}">
                                     
 
                                         <span class="textoNombre col-10" >
@@ -1840,13 +1550,13 @@ function conseguirIdProduct(){
                             if (grupoOpcion['active'] == '1') {
                                 document.getElementById('listaGrupoOpciones_sort').innerHTML += `
                         
-                        <li  class="list-group-item  btn btn-success item"id="${grupoOpcion['id']}_grupoOpcion"  data-id="${grupoOpcion['id']}_grupoOpcion">
+                        <li  class="list-group-item  btn btn-success item"id="${grupoOpcion['id']}_grupoOpcion"  data-id="${grupoOpcion['id']}">
                             @can('optionGroups.destroy')    
                                 <a onClick="removeOptionGroupFromProduct(${idProduct},${grupoOpcion['id']})" title="{{ trans('Remover este grupo de opciones') }}">
                                         <i class="fa fa-minus-circle text-danger" ></i>
                                 </a>
                             @endcan
-                                <span class="textoNombre col-8" onClick="selectGrupoOpcionList('${grupoOpcion['id']}_grupoOpcion',${res.length},${grupoOpcion['id']},${idProduct})">
+                                <span class="textoNombre col-8" onClick="seleccionarGrupoDeOpciones('${grupoOpcion['id']}',${res.length},${idProduct})">
                                     ${grupoOpcion['name']}
                                 </span>
                             <span class="handle ">
@@ -1871,13 +1581,13 @@ function conseguirIdProduct(){
                             } else {
                                 document.getElementById('listaGrupoOpciones_sort').innerHTML += `
                         
-                        <li  class="list-group-item  btn btn-success item  "id="${grupoOpcion['id']}_grupoOpcion"  data-id="${grupoOpcion['id']}_grupoOpcion">
+                        <li  class="list-group-item  btn btn-success item  "id="${grupoOpcion['id']}_grupoOpcion"  data-id="${grupoOpcion['id']}">
                             @can('products.destroy')    
                                 <a onClick="removeOptionGroupFromProduct(${idProduct},${grupoOpcion['id']})" title="{{ trans('Remover este grupo de opciones') }}">
                                         <i class="fa fa-minus-circle text-danger" ></i>
                                 </a>
                             @endcan
-                                <span class="textoNombre col-8 desactivado" onClick="selectGrupoOpcionList('${grupoOpcion['id']}_grupoOpcion',${res.length},${grupoOpcion['id']},${idProduct})">
+                                <span class="textoNombre col-8 desactivado" onClick="seleccionarGrupoDeOpciones('${grupoOpcion['id']}',${res.length},${idProduct})">
                                     ${grupoOpcion['name']}
                                 </span>
                             <span class="handle ">
@@ -1973,19 +1683,19 @@ function conseguirIdProduct(){
 
         };
 
-        function selectGrupoOpcionList(idGrupoOpcion, countCategories, idGrupoOpcionOriginal, idProduct) {
+        function seleccionarGrupoDeOpciones(idGrupoOpcion, countCategories, idProduct) {
             var target = $('.sort_products_grupo_opciones');
             var sortData = target.sortable('toArray', {
                 attribute: 'data-id'
             })
 
             for (let index = 0; index < countCategories; index++) {
-                document.getElementById(sortData[index]).className = 'list-group-item  btn btn-success item';
+                document.getElementById(sortData[index]+"_grupoOpcion").className = 'list-group-item  btn btn-success item';
             }
             document.getElementById('listaOpciones').innerHTML = ' ';
 
-            document.getElementById(idGrupoOpcion).className += ' select';
-            getOptions(idGrupoOpcionOriginal, idProduct);
+            document.getElementById(idGrupoOpcion+"_grupoOpcion").className += ' select';
+            getOptions(idGrupoOpcion, idProduct);
 
         }
 
@@ -2113,12 +1823,12 @@ function conseguirIdProduct(){
                 alert('El nombre es obligatorio');
             }
             if (nomAdmin.length == 0) {
-
+                nomAdmin = '';
                 alert('El nombre administrativo es obligatorio');
             }
             if (cantSelectable <= 0) {
-
-                alert('La cantidad seleccionable no es valida');
+                cantSelectable= 1;
+                // alert('La cantidad seleccionable no es valida');
             }
 
             if (cantSelectable > 0 && nomAdmin.length > 0 && nom.length > 0) {
@@ -2282,7 +1992,7 @@ function conseguirIdProduct(){
                             if (opciones['active'] == '1') {
                                 document.getElementById('listaOpciones_sort').innerHTML += `
                         
-                        <li  class="list-group-item   "id="${opciones['id']}_opciones" onClick="selectOpcion('${opciones['id']}_opciones',${res.length})" data-id="${opciones['id']}_opciones">
+                        <li  class="list-group-item   "id="${opciones['id']}_opciones"  data-id="${opciones['id']}">
                             @can('options.destroy')    
                                     <a   onClick="removeFromOptiongGroup(${opciones['id']},${idProducto},${idGrupoOpcion})">
                                         <i class="fa fa-minus-circle text-danger"></i>
@@ -2312,91 +2022,89 @@ function conseguirIdProduct(){
                             @endcan
                         </li> 
                         
-                </div>
-                    `;
-                            } else {
-                                document.getElementById('listaOpciones_sort').innerHTML += `
-                        
-                        <li  class="list-group-item   "id="${opciones['id']}_opciones" onClick="selectOpcion('${opciones['id']}_opciones',${res.length})" data-id="${opciones['id']}_opciones">
-                            @can('options.destroy')    
-                                    <a   onClick="removeFromOptiongGroup(${opciones['id']},${idProducto},${idGrupoOpcion})">
-                                        <i class="fa fa-minus-circle text-danger"></i>
-                                    </a>
-                            @endcan
-                            <div id="${opciones['id']}_option_name" class="textoNombre col-8">
-                                <div class="desactivado">
-                                        ${opciones['name']}
-                                </div>
-                                <div  class="Limpiar" >
-                                        <b> ${priceOption}</b>
-                                </div>
-                            </div>
-                            <span class="handle ">
-                                <i class="fa fa-sort" style="color: white; padding-left:4px"></i>
-                            </span>
-                            @can('products.edit')
-                                    
-                                    <a    onClick="selectIdGrupoOpcionUpdate(${idGrupoOpcion},${idProducto},${opciones['id']},'${opciones['name']}',${opciones['price']},${opciones['active']})" data-toggle="modal" data-target="#ModalUpdateOpcion" >
-                                        <i class=" fa fa-edit btnEditar"></i>
-                                    </a>
-                            @endcan
-                            @can('products.destroy')
+                        </div>
+                            `;
+                                    } else {
+                                        document.getElementById('listaOpciones_sort').innerHTML += `
+                                
+                                <li  class="list-group-item   "id="${opciones['id']}_opciones"  data-id="${opciones['id']}">
+                                    @can('options.destroy')    
+                                            <a   onClick="removeFromOptiongGroup(${opciones['id']},${idProducto},${idGrupoOpcion})">
+                                                <i class="fa fa-minus-circle text-danger"></i>
+                                            </a>
+                                    @endcan
+                                    <div id="${opciones['id']}_option_name" class="textoNombre col-8">
+                                        <div class="desactivado">
+                                                ${opciones['name']}
+                                        </div>
+                                        <div  class="Limpiar" >
+                                                <b> ${priceOption}</b>
+                                        </div>
+                                    </div>
+                                    <span class="handle ">
+                                        <i class="fa fa-sort" style="color: white; padding-left:4px"></i>
+                                    </span>
+                                    @can('products.edit')
+                                            
+                                            <a    onClick="selectIdGrupoOpcionUpdate(${idGrupoOpcion},${idProducto},${opciones['id']},'${opciones['name']}',${opciones['price']},${opciones['active']})" data-toggle="modal" data-target="#ModalUpdateOpcion" >
+                                                <i class=" fa fa-edit btnEditar"></i>
+                                            </a>
+                                    @endcan
+                                    @can('products.destroy')
 
-                                    <a   onClick="alternarActivacionOpcion(${idGrupoOpcion},${idProducto},${opciones['id']},'${opciones['name']}',${opciones['price']},${opciones['active']})">
-                                        <i class="fa fa-low-vision btn btn-link text-danger"></i>
-                                    </a>
-                            @endcan
-                        </li> 
-                        
-                </div>
-                    `;
-                            }
+                                            <a   onClick="alternarActivacionOpcion(${idGrupoOpcion},${idProducto},${opciones['id']},'${opciones['name']}',${opciones['price']},${opciones['active']})">
+                                                <i class="fa fa-low-vision btn btn-link text-danger"></i>
+                                            </a>
+                                    @endcan
+                                </li> 
+                                
+                        </div>
+                            `;
+                                    }
 
-                        });
-
-                        function updateSortOrdenOption(idString) {
-                            $.ajaxSetup({
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                }
-                            });
-                            $.ajax({
-                                url: '{!!  url("options/sort_orden") !!}',
-                                method: 'POST',
-                                data: {
-                                    ids: idString
-                                },
-                                success: function() {
-
-                                }
-
-                            })
-
-                        }
-                        var targetCategories = $('.sort_products_options');
-                        targetCategories.sortable({
-                            handle: '.handle',
-                            placeholder: 'highlight',
-                            axis: "y",
-                            update: function(e, ui) {
-                                var sortData = targetCategories.sortable('toArray', {
-                                    attribute: 'data-id'
                                 });
-                                updateSortOrdenOption(sortData.join(','));
 
-                            }
-                        });
+                                function updateSortOrdenOption(idString) {
+                                    $.ajaxSetup({
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        }
+                                    });
+                                    $.ajax({
+                                        url: '{!!  url("options/sort_orden") !!}',
+                                        method: 'POST',
+                                        data: {
+                                            ids: idString
+                                        },
+                                        success: function() {
 
-                    } else {
-                        document.getElementById('listaOpciones').innerHTML = `
-                    <div class="">
-                    {!!  Form::label('Ninguna', trans('------ Lista Vacía ------ '), ['class' => ' control-label text-left textoBlanco']) !!}
-                </div>
+                                        }
+
+                                    })
+
+                                }
+                                var targetCategories = $('.sort_products_options');
+                                targetCategories.sortable({
+                                    handle: '.handle',
+                                    placeholder: 'highlight',
+                                    axis: "y",
+                                    update: function(e, ui) {
+                                        var sortData = targetCategories.sortable('toArray', {
+                                            attribute: 'data-id'
+                                        });
+                                        updateSortOrdenOption(sortData.join(','));
+
+                                    }
+                                });
+
+                            } else {
+                                document.getElementById('listaOpciones').innerHTML = `
+                            <div class="">
+                            {!!  Form::label('Ninguna', trans('------ Lista Vacía ------ '), ['class' => ' control-label text-left textoBlanco']) !!}
+                        </div>
                     `;
                     }
-                    if (IdOpcionUpdate != null) {
-                        // document.getElementById(IdOpcionUpdate+'_opciones').className += ' select';
-                    }
+
                 }
 
             });
@@ -2419,18 +2127,6 @@ function conseguirIdProduct(){
             }
         };
 
-        function selectOpcion(idOpcion, countOpcion) {
-            // var target = $('.sort_products_options');
-            // var sortData = target.sortable('toArray', {
-            //     attribute: 'data-id'
-            // })
-
-            // for (let index = 0; index < countOpcion; index++) {
-            //     document.getElementById(sortData[index]).className = 'list-group-item  btn btn-success item';
-            // }
-            // document.getElementById(idOpcion).className += ' select';
-
-        }
 
         function alternarActivacionOpcion(idGroup, idProduct, idOpcion, nombre, priceRec, active) {
             if (active == "1") {
@@ -2504,6 +2200,7 @@ function conseguirIdProduct(){
                         active: chkActive,
                         option_group_id: idGrupo,
                         product_id: idProduct,
+                        market_id:{{ $market->id }}
                     },
                     success: function(res) {
 
@@ -2562,7 +2259,7 @@ function conseguirIdProduct(){
                     },
                     success: function(res) {
                         $('#mtxtNombreOption').val('');
-                        $('#mtxtPriceOption').val(1);
+                        $('#mtxtPriceOption').val(0);
                         $('#mbtnCerrarCreateOpcionModal').click();
 
                         recargrarOpciones(idGrupo, idProduct);
@@ -2779,22 +2476,6 @@ function conseguirIdProduct(){
             $('#IDOpcionesParaAgregar').val('').change();
             $('#IDProductosParaAgregar').val('').change();
             $('#IDGrupoOpcionesParaAgregar').val('').change();
-
-        }
-
-        function vaciarListaProducto() {
-            if (document.getElementById('btnAgregarProductos') != null) {
-                document.getElementById('btnAgregarProductos').innerHTML = ``;
-            }
-            if (document.getElementById('listaProductos') != null) {
-                document.getElementById('listaProductos').innerHTML = `
-                   
-                <ul class="sort_products list-group" id="sort_products_sort">
-
-                </ul>
-            
-            `;
-            }
 
         }
 
